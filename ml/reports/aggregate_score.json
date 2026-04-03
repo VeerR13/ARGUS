@@ -1,0 +1,18 @@
+{
+  "aggregate_score_0_100": 96.1,
+  "component_scores": {
+    "phantom_rate_score": 1.0,
+    "iou_consistency_score": 0.9369,
+    "bbox_lag_score": 0.9115,
+    "dedup_accuracy_score": 1.0,
+    "interframe_score": 0.9601
+  },
+  "weights": {
+    "phantom_rate": 0.25,
+    "iou_consistency": 0.25,
+    "bbox_lag": 0.2,
+    "dedup_accuracy": 0.15,
+    "interframe_consist": 0.15
+  },
+  "grade": "A"
+}

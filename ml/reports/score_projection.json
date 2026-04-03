@@ -1,0 +1,112 @@
+{
+  "self_eval_scores": {
+    "iou": 93.7,
+    "phantom": 100.0,
+    "lag": 91.1,
+    "dedup": 100.0,
+    "consistency": 96.0
+  },
+  "projected_scores": {
+    "optimistic": {
+      "aggregate_score": 84.8,
+      "components": {
+        "iou": 79.6,
+        "phantom_fp": 90.0,
+        "recall": 84.0,
+        "precision": 87.0,
+        "bbox_lag": 83.9
+      }
+    },
+    "realistic": {
+      "aggregate_score": 76.4,
+      "components": {
+        "iou": 70.3,
+        "phantom_fp": 80.0,
+        "recall": 76.0,
+        "precision": 80.0,
+        "bbox_lag": 77.5
+      }
+    },
+    "pessimistic": {
+      "aggregate_score": 63.6,
+      "components": {
+        "iou": 58.1,
+        "phantom_fp": 65.0,
+        "recall": 64.0,
+        "precision": 68.0,
+        "bbox_lag": 65.6
+      }
+    }
+  },
+  "score_range": {
+    "optimistic": 84.8,
+    "realistic": 76.4,
+    "pessimistic": 63.6,
+    "formatted": "64\u201385"
+  },
+  "risk_ranking": [
+    {
+      "metric": "IoU (most at risk)",
+      "self_score": 93.7,
+      "projected_realistic": 70.3,
+      "reason": "Pseudo-GT used consecutive-frame IoU as a proxy, not human-drawn tight boxes. Real IoU against human annotations is typically 15\u201325% lower due to annotator drawing tighter boxes and including partially-visible vehicles."
+    },
+    {
+      "metric": "Recall (unmeasured)",
+      "self_score": "N/A (not yet measured)",
+      "projected_realistic": 76.0,
+      "reason": "Recall was never measured in Week 2 \u2014 no false-negative count exists. The temporal confirmation buffer (3-frame requirement) intentionally misses vehicles that appear for < 3 frames, increasing miss rate."
+    },
+    {
+      "metric": "Phantom/FP rate (moderate risk)",
+      "self_score": 100.0,
+      "projected_realistic": 80.0,
+      "reason": "Phantom rate was measured using \u22642-frame tracks as a proxy. Human annotators will catch additional FPs (e.g. stopped shadows, sign glare) that the proxy metric misses."
+    }
+  ],
+  "gap_analysis": {
+    "current_self_eval_score": 96.1,
+    "projected_real_realistic": 76.4,
+    "gap_to_completion_88": 11.6,
+    "gap_to_target_95": 18.6,
+    "week2_genuinely_complete": false,
+    "improvements_for_95": [
+      "Train on \u2265500 human-annotated positive samples (currently using weak pseudo-labels)",
+      "Expand hard-negative dataset to \u22652,000 samples across 10+ diverse videos",
+      "Add camera calibration homography to replace pixels_per_meter=22 rough estimate",
+      "Use YOLOv8m or YOLOv9 backbone (higher mAP baseline vs yolov8n)",
+      "Tune temporal buffer: try CONFIRM_MIN_FRAMES=2 on night footage (3 causes miss rate spike)",
+      "Add night-specific augmentation: extreme brightness reduction + color jitter",
+      "Validate on footage from a different dashcam/location (domain generalization check)"
+    ]
+  },
+  "minimum_to_complete": 88.0,
+  "target_score": 95.0,
+  "discount_factors_used": {
+    "iou": {
+      "optimistic": 0.85,
+      "realistic": 0.75,
+      "pessimistic": 0.62
+    },
+    "phantom": {
+      "optimistic": 0.9,
+      "realistic": 0.8,
+      "pessimistic": 0.65
+    },
+    "lag": {
+      "optimistic": 0.92,
+      "realistic": 0.85,
+      "pessimistic": 0.72
+    },
+    "dedup": {
+      "optimistic": 0.95,
+      "realistic": 0.88,
+      "pessimistic": 0.75
+    },
+    "consistency": {
+      "optimistic": 0.93,
+      "realistic": 0.86,
+      "pessimistic": 0.72
+    }
+  }
+}

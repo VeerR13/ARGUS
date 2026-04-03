@@ -1,0 +1,329 @@
+{
+  "video_id": "demo_001",
+  "metadata": {
+    "filename": "output_dashcam_annotated.mp4",
+    "video_url": "assets/output_dashcam_h264.mp4",
+    "duration_seconds": 30,
+    "fps": 30,
+    "resolution": "1280x720",
+    "total_frames": 900
+  },
+  "summary": {
+    "total_vehicles": 28,
+    "total_incidents": 9,
+    "accidents": 2,
+    "near_misses": 7,
+    "avg_speed_kmh": 38,
+    "max_speed_kmh": 118,
+    "congestion_index": 6.4,
+    "detection_confidence": 94.2,
+    "tracking_accuracy": 89.7,
+    "classification_precision": 91.5,
+    "processing_time_seconds": 18,
+    "vehicle_composition": {
+      "car": 19,
+      "motorcycle": 4,
+      "truck": 3,
+      "bus": 1,
+      "other": 1
+    },
+    "flow_timeline": [18,22,31,45,58,72,68,82,76,61,49,38,44,55,63,57,48,39,30],
+    "speed_distribution": {
+      "0-20": 3,
+      "20-40": 12,
+      "40-60": 9,
+      "60-80": 3,
+      "80+": 1
+    },
+    "lane_utilization": {
+      "lane1": 72,
+      "lane2": 91,
+      "lane3": 58,
+      "lane4": 44
+    },
+    "congestion_heatmap": [
+      [1,2,4,6,8,9,8,7,5,6,8,9,10,8,7,6,5,4,3,2],
+      [2,3,5,7,8,9,8,6,5,7,8,10,9,7,6,5,4,3,2,1],
+      [1,2,3,5,7,8,7,5,4,5,7,9,8,6,5,4,3,2,1,1],
+      [2,3,4,5,6,7,6,5,4,5,6,7,8,6,5,4,3,2,1,2]
+    ]
+  },
+  "incidents": [
+    {
+      "id": "ff64aa0b",
+      "type": "near_miss",
+      "severity": "high",
+      "timestamp_start": 1.401,
+      "timestamp_end": 1.701,
+      "description": "V9 and V12 dangerously close — TTC fell below 0.3s threshold",
+      "causal_factors": [
+        {"type": "tailgating", "confidence": 0.91, "vehicle_id": 9, "description": "Following distance fell below 1.5× stopping-distance threshold at time of detection."},
+        {"type": "speed_differential", "confidence": 0.82, "vehicle_id": 12, "description": "Speed variance exceeded 30 km/h between the two vehicles in the same flow corridor."}
+      ],
+      "vehicles_involved": [9, 12],
+      "confidence": 0.95,
+      "bbox_sequence": []
+    },
+    {
+      "id": "4022bfa2",
+      "type": "accident",
+      "severity": "high",
+      "timestamp_start": 1.568,
+      "timestamp_end": 1.935,
+      "description": "V5 and V11 contact event — PET = 0.0s, collision confirmed by bounding-box overlap",
+      "causal_factors": [
+        {"type": "failure_to_yield", "confidence": 0.89, "vehicle_id": 5, "description": "Vehicle failed to reduce speed at an identified yield zone, entering conflict space occupied by V11."},
+        {"type": "unsafe_lane_change", "confidence": 0.76, "vehicle_id": 11, "description": "Lateral encroachment detected without sufficient gap clearance, placing V11 in path of V5."}
+      ],
+      "vehicles_involved": [5, 11],
+      "confidence": 0.95,
+      "bbox_sequence": []
+    },
+    {
+      "id": "a98058de",
+      "type": "near_miss",
+      "severity": "high",
+      "timestamp_start": 1.735,
+      "timestamp_end": 1.968,
+      "description": "V3 and V12 converging paths — minimum separation 0.4 m",
+      "causal_factors": [
+        {"type": "tailgating", "confidence": 0.80, "vehicle_id": 3, "description": "V3 closing rapidly on V12 with insufficient deceleration margin."},
+        {"type": "speed_differential", "confidence": 0.68, "vehicle_id": 12, "description": "V12 slowing while V3 maintained high approach speed, compressing the gap to near-contact."}
+      ],
+      "vehicles_involved": [3, 12],
+      "confidence": 0.80,
+      "bbox_sequence": []
+    },
+    {
+      "id": "2a4c6e8f-0b1d-4e3f-a5b7-c9d1e3f5a7b9",
+      "type": "near_miss",
+      "severity": "low",
+      "timestamp_start": 5.0,
+      "timestamp_end": 6.2,
+      "description": "Traffic density spike — flow increased 34% over 4 seconds",
+      "causal_factors": [
+        {"type": "speed_differential", "confidence": 0.61, "vehicle_id": 1, "description": "Rapid flow compression caused speed variance between vehicles in adjacent lanes."}
+      ],
+      "vehicles_involved": [1, 4, 9],
+      "confidence": 0.61,
+      "bbox_sequence": []
+    },
+    {
+      "id": "6d8f0b2c-4e6a-4f8c-b0d2-e4f6a8b0c2d4",
+      "type": "near_miss",
+      "severity": "medium",
+      "timestamp_start": 8.3,
+      "timestamp_end": 9.8,
+      "description": "V7 recorded at 94 km/h — 44 km/h above posted limit",
+      "causal_factors": [
+        {"type": "speed_differential", "confidence": 0.95, "vehicle_id": 7, "description": "Vehicle operating at 94 km/h against a 50 km/h posted limit, creating high closing speed with leading traffic."}
+      ],
+      "vehicles_involved": [7],
+      "confidence": 0.95,
+      "bbox_sequence": []
+    },
+    {
+      "id": "1c3e5f7a-9b0d-4e2f-a4c6-e8f0b2d4f6a8",
+      "type": "near_miss",
+      "severity": "low",
+      "timestamp_start": 12.0,
+      "timestamp_end": 14.5,
+      "description": "Queue exceeded 8-vehicle threshold at lane 2 approach",
+      "causal_factors": [
+        {"type": "obstruction", "confidence": 0.72, "vehicle_id": null, "description": "Stationary queue formation blocking active lane, creating rear-end hazard for approaching vehicles."}
+      ],
+      "vehicles_involved": [],
+      "confidence": 0.72,
+      "bbox_sequence": []
+    },
+    {
+      "id": "8a0b2c4d-6e8f-4a0b-c2d4-f6a8b0c2d4e6",
+      "type": "risky_interaction",
+      "severity": "medium",
+      "timestamp_start": 16.4,
+      "timestamp_end": 18.0,
+      "description": "Tracking confidence dropped to 61% — partial occlusion between V15 and V19",
+      "causal_factors": [
+        {"type": "obstruction", "confidence": 0.67, "vehicle_id": 15, "description": "Partial vehicle occlusion reduced tracking confidence below acceptable threshold, masking potential conflict."}
+      ],
+      "vehicles_involved": [15, 19],
+      "confidence": 0.67,
+      "bbox_sequence": []
+    },
+    {
+      "id": "4e6f8a0b-2c4d-4f6a-8b0c-2d4e6f8a0b2c",
+      "type": "accident",
+      "severity": "high",
+      "timestamp_start": 20.2,
+      "timestamp_end": 23.9,
+      "description": "Stationary obstruction — V22 stopped in lane 1, rear-end risk",
+      "causal_factors": [
+        {"type": "obstruction", "confidence": 0.93, "vehicle_id": 22, "description": "Vehicle V22 stationary in active traffic lane, presenting imminent rear-end collision hazard."},
+        {"type": "tailgating", "confidence": 0.81, "vehicle_id": 20, "description": "Vehicle V20 maintaining insufficient following distance at approach speed, unable to stop in time."}
+      ],
+      "vehicles_involved": [22, 20],
+      "confidence": 0.93,
+      "bbox_sequence": []
+    },
+    {
+      "id": "0b2d4f6a-8c0e-4a2c-b4d6-f8a0b2c4d6e8",
+      "type": "near_miss",
+      "severity": "high",
+      "timestamp_start": 25.1,
+      "timestamp_end": 27.4,
+      "description": "V25 unsafe lane change — encroached lane without adequate gap",
+      "causal_factors": [
+        {"type": "unsafe_lane_change", "confidence": 0.89, "vehicle_id": 25, "description": "Vehicle V25 entered adjacent lane without sufficient clearance, forcing V18 to brake sharply."}
+      ],
+      "vehicles_involved": [25, 18],
+      "confidence": 0.89,
+      "bbox_sequence": []
+    }
+  ],
+  "trajectories": [
+    {
+      "trajectory_id": 1,
+      "vehicle_id": 3,
+      "vehicle_class": "car",
+      "first_frame": 2,
+      "last_frame": 74,
+      "frame_count": 25,
+      "video_id": "demo_001",
+      "frames": [
+        {"frame_num": 2,  "timestamp_ms": 67,   "bbox": [466,468,586,538], "center": [526,503], "speed_estimate": 10.0},
+        {"frame_num": 5,  "timestamp_ms": 167,  "bbox": [444,473,564,543], "center": [504,508], "speed_estimate": 14.5},
+        {"frame_num": 8,  "timestamp_ms": 267,  "bbox": [422,477,542,547], "center": [482,512], "speed_estimate": 19.0},
+        {"frame_num": 11, "timestamp_ms": 367,  "bbox": [400,482,520,552], "center": [460,517], "speed_estimate": 23.5},
+        {"frame_num": 14, "timestamp_ms": 467,  "bbox": [378,486,498,556], "center": [438,521], "speed_estimate": 28.0},
+        {"frame_num": 17, "timestamp_ms": 567,  "bbox": [356,491,476,561], "center": [416,526], "speed_estimate": 32.5},
+        {"frame_num": 20, "timestamp_ms": 667,  "bbox": [334,495,454,565], "center": [394,530], "speed_estimate": 37.0},
+        {"frame_num": 23, "timestamp_ms": 767,  "bbox": [312,500,432,570], "center": [372,535], "speed_estimate": 41.5},
+        {"frame_num": 26, "timestamp_ms": 867,  "bbox": [290,504,410,574], "center": [350,539], "speed_estimate": 46.0},
+        {"frame_num": 29, "timestamp_ms": 967,  "bbox": [268,509,388,579], "center": [328,544], "speed_estimate": 50.5},
+        {"frame_num": 32, "timestamp_ms": 1067, "bbox": [246,513,366,583], "center": [306,548], "speed_estimate": 55.0},
+        {"frame_num": 35, "timestamp_ms": 1167, "bbox": [224,518,344,588], "center": [284,553], "speed_estimate": 59.5},
+        {"frame_num": 38, "timestamp_ms": 1267, "bbox": [202,522,322,592], "center": [262,557], "speed_estimate": 64.0},
+        {"frame_num": 41, "timestamp_ms": 1367, "bbox": [180,527,300,597], "center": [240,562], "speed_estimate": 68.5},
+        {"frame_num": 44, "timestamp_ms": 1467, "bbox": [158,531,278,601], "center": [218,566], "speed_estimate": 73.0},
+        {"frame_num": 47, "timestamp_ms": 1567, "bbox": [136,536,256,606], "center": [196,571], "speed_estimate": 77.5},
+        {"frame_num": 50, "timestamp_ms": 1667, "bbox": [114,540,234,610], "center": [174,575], "speed_estimate": 82.0},
+        {"frame_num": 53, "timestamp_ms": 1767, "bbox": [92,545,212,615],  "center": [152,580], "speed_estimate": 86.5},
+        {"frame_num": 56, "timestamp_ms": 1867, "bbox": [70,549,190,619],  "center": [130,584], "speed_estimate": 91.0},
+        {"frame_num": 59, "timestamp_ms": 1967, "bbox": [48,554,168,624],  "center": [108,589], "speed_estimate": 95.5},
+        {"frame_num": 62, "timestamp_ms": 2067, "bbox": [26,558,146,628],  "center": [86,593],  "speed_estimate": 100.0},
+        {"frame_num": 65, "timestamp_ms": 2167, "bbox": [4,563,124,633],   "center": [64,598],  "speed_estimate": 104.5},
+        {"frame_num": 68, "timestamp_ms": 2267, "bbox": [0,567,102,637],   "center": [42,602],  "speed_estimate": 109.0},
+        {"frame_num": 71, "timestamp_ms": 2367, "bbox": [0,572,80,642],    "center": [20,607],  "speed_estimate": 113.5},
+        {"frame_num": 74, "timestamp_ms": 2467, "bbox": [0,579,64,649],    "center": [4,614],   "speed_estimate": 118.0}
+      ]
+    },
+    {
+      "trajectory_id": 2,
+      "vehicle_id": 5,
+      "vehicle_class": "car",
+      "first_frame": 2,
+      "last_frame": 74,
+      "frame_count": 25,
+      "video_id": "demo_001",
+      "frames": [
+        {"frame_num": 2,  "timestamp_ms": 67,   "bbox": [540,449,670,519], "center": [605,484], "speed_estimate": 2.1},
+        {"frame_num": 5,  "timestamp_ms": 167,  "bbox": [541,450,671,520], "center": [606,485], "speed_estimate": 1.8},
+        {"frame_num": 8,  "timestamp_ms": 267,  "bbox": [540,450,670,520], "center": [605,485], "speed_estimate": 2.3},
+        {"frame_num": 11, "timestamp_ms": 367,  "bbox": [541,451,671,521], "center": [606,486], "speed_estimate": 1.5},
+        {"frame_num": 14, "timestamp_ms": 467,  "bbox": [540,451,670,521], "center": [605,486], "speed_estimate": 1.9},
+        {"frame_num": 17, "timestamp_ms": 567,  "bbox": [539,451,669,521], "center": [604,486], "speed_estimate": 2.0},
+        {"frame_num": 20, "timestamp_ms": 667,  "bbox": [540,452,670,522], "center": [605,487], "speed_estimate": 1.7},
+        {"frame_num": 23, "timestamp_ms": 767,  "bbox": [541,452,671,522], "center": [606,487], "speed_estimate": 2.2},
+        {"frame_num": 26, "timestamp_ms": 867,  "bbox": [540,452,670,522], "center": [605,487], "speed_estimate": 1.8},
+        {"frame_num": 29, "timestamp_ms": 967,  "bbox": [539,452,669,522], "center": [604,487], "speed_estimate": 2.1},
+        {"frame_num": 32, "timestamp_ms": 1067, "bbox": [540,453,670,523], "center": [605,488], "speed_estimate": 1.6},
+        {"frame_num": 35, "timestamp_ms": 1167, "bbox": [541,453,671,523], "center": [606,488], "speed_estimate": 2.0},
+        {"frame_num": 38, "timestamp_ms": 1267, "bbox": [541,454,671,524], "center": [606,489], "speed_estimate": 1.8},
+        {"frame_num": 41, "timestamp_ms": 1367, "bbox": [540,454,670,524], "center": [605,489], "speed_estimate": 1.9},
+        {"frame_num": 44, "timestamp_ms": 1467, "bbox": [539,454,669,524], "center": [604,489], "speed_estimate": 2.2},
+        {"frame_num": 47, "timestamp_ms": 1567, "bbox": [540,454,670,524], "center": [605,489], "speed_estimate": 1.7},
+        {"frame_num": 50, "timestamp_ms": 1667, "bbox": [541,454,671,524], "center": [606,489], "speed_estimate": 2.1},
+        {"frame_num": 53, "timestamp_ms": 1767, "bbox": [541,454,671,524], "center": [606,489], "speed_estimate": 1.8},
+        {"frame_num": 56, "timestamp_ms": 1867, "bbox": [540,453,670,523], "center": [605,488], "speed_estimate": 2.0},
+        {"frame_num": 59, "timestamp_ms": 1967, "bbox": [539,453,669,523], "center": [604,488], "speed_estimate": 1.6},
+        {"frame_num": 62, "timestamp_ms": 2067, "bbox": [540,453,670,523], "center": [605,488], "speed_estimate": 1.9},
+        {"frame_num": 65, "timestamp_ms": 2167, "bbox": [541,453,671,523], "center": [606,488], "speed_estimate": 2.1},
+        {"frame_num": 68, "timestamp_ms": 2267, "bbox": [540,452,670,522], "center": [605,487], "speed_estimate": 1.8},
+        {"frame_num": 71, "timestamp_ms": 2367, "bbox": [539,451,669,521], "center": [604,486], "speed_estimate": 2.0},
+        {"frame_num": 74, "timestamp_ms": 2467, "bbox": [540,451,670,521], "center": [605,486], "speed_estimate": 1.7}
+      ]
+    },
+    {
+      "trajectory_id": 3,
+      "vehicle_id": 9,
+      "vehicle_class": "car",
+      "first_frame": 21,
+      "last_frame": 93,
+      "frame_count": 25,
+      "video_id": "demo_001",
+      "frames": [
+        {"frame_num": 21, "timestamp_ms": 700,  "bbox": [480,462,600,532], "center": [540,497], "speed_estimate": 5.0},
+        {"frame_num": 24, "timestamp_ms": 800,  "bbox": [466,466,586,536], "center": [526,501], "speed_estimate": 9.3},
+        {"frame_num": 27, "timestamp_ms": 900,  "bbox": [452,470,572,540], "center": [512,505], "speed_estimate": 13.5},
+        {"frame_num": 30, "timestamp_ms": 1000, "bbox": [438,474,558,544], "center": [498,509], "speed_estimate": 17.8},
+        {"frame_num": 33, "timestamp_ms": 1100, "bbox": [424,478,544,548], "center": [484,513], "speed_estimate": 22.0},
+        {"frame_num": 36, "timestamp_ms": 1200, "bbox": [410,482,530,552], "center": [470,517], "speed_estimate": 26.3},
+        {"frame_num": 39, "timestamp_ms": 1300, "bbox": [396,486,516,556], "center": [456,521], "speed_estimate": 30.5},
+        {"frame_num": 42, "timestamp_ms": 1400, "bbox": [382,490,502,560], "center": [442,525], "speed_estimate": 34.8},
+        {"frame_num": 45, "timestamp_ms": 1500, "bbox": [368,494,488,564], "center": [428,529], "speed_estimate": 39.0},
+        {"frame_num": 48, "timestamp_ms": 1600, "bbox": [354,498,474,568], "center": [414,533], "speed_estimate": 43.3},
+        {"frame_num": 51, "timestamp_ms": 1700, "bbox": [340,502,460,572], "center": [400,537], "speed_estimate": 47.5},
+        {"frame_num": 54, "timestamp_ms": 1800, "bbox": [326,506,446,576], "center": [386,541], "speed_estimate": 51.8},
+        {"frame_num": 57, "timestamp_ms": 1900, "bbox": [312,510,432,580], "center": [372,545], "speed_estimate": 56.0},
+        {"frame_num": 60, "timestamp_ms": 2000, "bbox": [298,514,418,584], "center": [358,549], "speed_estimate": 60.3},
+        {"frame_num": 63, "timestamp_ms": 2100, "bbox": [284,518,404,588], "center": [344,553], "speed_estimate": 64.5},
+        {"frame_num": 66, "timestamp_ms": 2200, "bbox": [270,522,390,592], "center": [330,557], "speed_estimate": 68.8},
+        {"frame_num": 69, "timestamp_ms": 2300, "bbox": [256,526,376,596], "center": [316,561], "speed_estimate": 73.0},
+        {"frame_num": 72, "timestamp_ms": 2400, "bbox": [242,530,362,600], "center": [302,565], "speed_estimate": 77.3},
+        {"frame_num": 75, "timestamp_ms": 2500, "bbox": [228,534,348,604], "center": [288,569], "speed_estimate": 81.5},
+        {"frame_num": 78, "timestamp_ms": 2600, "bbox": [214,538,334,608], "center": [274,573], "speed_estimate": 85.8},
+        {"frame_num": 81, "timestamp_ms": 2700, "bbox": [200,542,320,612], "center": [260,577], "speed_estimate": 90.0},
+        {"frame_num": 84, "timestamp_ms": 2800, "bbox": [186,546,306,616], "center": [246,581], "speed_estimate": 94.3},
+        {"frame_num": 87, "timestamp_ms": 2900, "bbox": [172,550,292,620], "center": [232,585], "speed_estimate": 98.5},
+        {"frame_num": 90, "timestamp_ms": 3000, "bbox": [158,554,278,624], "center": [218,589], "speed_estimate": 102.8},
+        {"frame_num": 93, "timestamp_ms": 3100, "bbox": [144,558,264,628], "center": [204,593], "speed_estimate": 107.0}
+      ]
+    },
+    {
+      "trajectory_id": 4,
+      "vehicle_id": 12,
+      "vehicle_class": "car",
+      "first_frame": 23,
+      "last_frame": 95,
+      "frame_count": 25,
+      "video_id": "demo_001",
+      "frames": [
+        {"frame_num": 23, "timestamp_ms": 767,  "bbox": [1189,628,1280,698], "center": [1249,663], "speed_estimate": 10.0},
+        {"frame_num": 26, "timestamp_ms": 867,  "bbox": [1180,625,1280,695], "center": [1240,660], "speed_estimate": 11.7},
+        {"frame_num": 29, "timestamp_ms": 967,  "bbox": [1171,622,1280,692], "center": [1231,657], "speed_estimate": 13.3},
+        {"frame_num": 32, "timestamp_ms": 1067, "bbox": [1162,619,1280,689], "center": [1222,654], "speed_estimate": 15.0},
+        {"frame_num": 35, "timestamp_ms": 1167, "bbox": [1153,616,1273,686], "center": [1213,651], "speed_estimate": 16.7},
+        {"frame_num": 38, "timestamp_ms": 1267, "bbox": [1144,613,1264,683], "center": [1204,648], "speed_estimate": 18.3},
+        {"frame_num": 41, "timestamp_ms": 1367, "bbox": [1135,610,1255,680], "center": [1195,645], "speed_estimate": 20.0},
+        {"frame_num": 44, "timestamp_ms": 1467, "bbox": [1126,607,1246,677], "center": [1186,642], "speed_estimate": 21.7},
+        {"frame_num": 47, "timestamp_ms": 1567, "bbox": [1117,604,1237,674], "center": [1177,639], "speed_estimate": 23.3},
+        {"frame_num": 50, "timestamp_ms": 1667, "bbox": [1108,601,1228,671], "center": [1168,636], "speed_estimate": 25.0},
+        {"frame_num": 53, "timestamp_ms": 1767, "bbox": [1099,598,1219,668], "center": [1159,633], "speed_estimate": 26.7},
+        {"frame_num": 56, "timestamp_ms": 1867, "bbox": [1090,595,1210,665], "center": [1150,630], "speed_estimate": 28.3},
+        {"frame_num": 59, "timestamp_ms": 1967, "bbox": [1081,592,1201,662], "center": [1141,627], "speed_estimate": 30.0},
+        {"frame_num": 62, "timestamp_ms": 2067, "bbox": [1072,589,1192,659], "center": [1132,624], "speed_estimate": 31.7},
+        {"frame_num": 65, "timestamp_ms": 2167, "bbox": [1063,586,1183,656], "center": [1123,621], "speed_estimate": 33.3},
+        {"frame_num": 68, "timestamp_ms": 2267, "bbox": [1054,583,1174,653], "center": [1114,618], "speed_estimate": 35.0},
+        {"frame_num": 71, "timestamp_ms": 2367, "bbox": [1045,580,1165,650], "center": [1105,615], "speed_estimate": 36.7},
+        {"frame_num": 74, "timestamp_ms": 2467, "bbox": [1036,577,1156,647], "center": [1096,612], "speed_estimate": 38.3},
+        {"frame_num": 77, "timestamp_ms": 2567, "bbox": [1027,574,1147,644], "center": [1087,609], "speed_estimate": 40.0},
+        {"frame_num": 80, "timestamp_ms": 2667, "bbox": [1018,571,1138,641], "center": [1078,606], "speed_estimate": 41.7},
+        {"frame_num": 83, "timestamp_ms": 2767, "bbox": [1009,568,1129,638], "center": [1069,603], "speed_estimate": 43.3},
+        {"frame_num": 86, "timestamp_ms": 2867, "bbox": [1000,565,1120,635], "center": [1060,600], "speed_estimate": 45.0},
+        {"frame_num": 89, "timestamp_ms": 2967, "bbox": [991,562,1111,632],  "center": [1051,597], "speed_estimate": 46.7},
+        {"frame_num": 92, "timestamp_ms": 3067, "bbox": [982,559,1102,629],  "center": [1042,594], "speed_estimate": 48.3},
+        {"frame_num": 95, "timestamp_ms": 3167, "bbox": [973,556,1093,626],  "center": [1033,591], "speed_estimate": 50.0}
+      ]
+    }
+  ]
+}

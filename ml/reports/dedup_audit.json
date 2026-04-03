@@ -1,0 +1,40 @@
+{
+  "overall": {
+    "total_raw_incidents": 28,
+    "unique_after_dedup": 8,
+    "duplicates_removed": 20,
+    "dedup_rate": 0.7143
+  },
+  "per_video": {
+    "accident_clip_1.mp4": {
+      "total_raw": 21,
+      "unique_after_dedup": 5,
+      "duplicates_removed": 16,
+      "dedup_rate": 0.7619
+    },
+    "accident_clip_2.mp4": {
+      "total_raw": 7,
+      "unique_after_dedup": 3,
+      "duplicates_removed": 4,
+      "dedup_rate": 0.5714
+    },
+    "dashcam_30s_720p.mp4": {
+      "total_raw": 0,
+      "unique_after_dedup": 0,
+      "duplicates_removed": 0,
+      "dedup_rate": 0.0
+    },
+    "highway_30s_720p.mp4": {
+      "total_raw": 0,
+      "unique_after_dedup": 0,
+      "duplicates_removed": 0,
+      "dedup_rate": 0.0
+    },
+    "night_road_720p.mp4": {
+      "total_raw": 0,
+      "unique_after_dedup": 0,
+      "duplicates_removed": 0,
+      "dedup_rate": 0.0
+    }
+  }
+}

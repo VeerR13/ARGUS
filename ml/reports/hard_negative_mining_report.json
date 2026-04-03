@@ -1,0 +1,35 @@
+{
+  "total_hard_negatives": 663,
+  "per_video": {
+    "accident_clip_1.mp4": {
+      "phantom_saved": 200,
+      "confirm_saved": 37
+    },
+    "accident_clip_2.mp4": {
+      "phantom_saved": 200,
+      "confirm_saved": 28
+    },
+    "dashcam_30s_720p.mp4": {
+      "phantom_saved": 90,
+      "confirm_saved": 58
+    },
+    "highway_30s_720p.mp4": {
+      "phantom_saved": 27,
+      "confirm_saved": 30
+    },
+    "night_road_720p.mp4": {
+      "phantom_saved": 146,
+      "confirm_saved": 18
+    }
+  },
+  "output_dirs": {
+    "images": "reports/hard_negatives/images",
+    "labels": "reports/hard_negatives/labels",
+    "review": "reports/hard_negatives/review"
+  },
+  "next_steps": [
+    "Spot-check hard_negatives/review/ \u2014 remove true positives",
+    "Add hard_negatives/ to YOLO training as background class",
+    "Re-train: yolo train data=data.yaml model=yolov8s.pt epochs=50"
+  ]
+}

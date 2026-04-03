@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+env/
+.env
+
+# ML artifacts
+*.pt
+*.pth
+*.onnx
+runs/
+ml/output_*/
+ml/output_*.json
+ml/output_*.mp4
+
+# Large data / frames (add via DVC or document in README)
+ml/annotation_tasks/frames_to_annotate/
+ml/annotation_tasks/*.zip
+ml/dataset/train/
+ml/dataset/val/
+ml/dataset/test/
+ml/reports/hard_negatives/
+ml/unseen_test_videos/
+ml/sample_videos/
+ml/models/
+
+# Demo videos in UI
+ui/assets/*.mp4
+ui/assets/*.avi
+
+# IDE / Claude
+.claude/
+.idea/
+.vscode/
+
+# macOS
+.DS_Store
+**/.DS_Store

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARGUS — Incident Detail</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    .incident-body {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 32px 28px 80px;
+    }
+
+    /* ── Breadcrumb ────────────────────────────────────── */
+    .breadcrumb {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .breadcrumb a {
+      color: rgba(255,255,255,0.3);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .breadcrumb a:hover { color: var(--accent); }
+    .breadcrumb-sep { color: rgba(255,255,255,0.15); }
+
+    /* ── Incident header ───────────────────────────────── */
+    .incident-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 32px;
+      align-items: start;
+      margin-bottom: 28px;
+    }
+
+    .inc-badges {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .inc-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 28px;
+      letter-spacing: 3px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .inc-timestamp {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .vehicle-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .vehicle-pill {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 1px;
+      border: 1px solid rgba(74,158,255,0.3);
+      padding: 3px 10px;
+      color: #4a9eff;
+    }
+
+    .inc-confidence-col {
+      text-align: right;
+    }
+
+    .inc-conf-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 52px;
+      color: #fff;
+      line-height: 1;
+      display: block;
+    }
+
+    .inc-conf-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.25);
+      text-transform: uppercase;
+      display: block;
+      margin-top: 4px;
+      margin-bottom: 16px;
+    }
+
+    .causal-mini {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+      min-width: 200px;
+    }
+
+    .causal-mini-row {
+      width: 100%;
+    }
+
+    .causal-mini-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .causal-mini-bar-bg {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .causal-mini-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--cyan));
+      transition: width 0.8s ease;
+    }
+
+    /* ── Main content ──────────────────────────────────── */
+    .incident-main {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 2px;
+      margin-bottom: 2px;
+    }
+
+    /* ── Video player ──────────────────────────────────── */
+    .video-wrapper {
+      position: relative;
+    }
+
+    #incident-video {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      display: block;
+      background: #000;
+      border: 1px solid var(--border);
+    }
+
+    .video-fallback {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: linear-gradient(135deg, #020408, #060d14);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .video-fallback-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+      text-align: center;
+      max-width: 260px;
+      line-height: 1.8;
+    }
+
+    /* Bbox canvas overlay */
+    #bbox-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    /* ── Incident timeline bar ─────────────────────────── */
+    .timeline-bar-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-top: none;
+      padding: 12px 16px;
+    }
+
+    .timeline-bar {
+      position: relative;
+      width: 100%;
+      height: 16px;
+      background: rgba(255,255,255,0.04);
+      cursor: pointer;
+    }
+
+    .timeline-bar-incident {
+      position: absolute;
+      top: 0;
+      height: 100%;
+    }
+
+    .timeline-bar-cursor {
+      position: absolute;
+      top: -2px;
+      width: 1px;
+      height: calc(100% + 4px);
+      background: var(--accent);
+    }
+
+    .timeline-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+    }
+
+    .timeline-bar-labels span {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.25);
+    }
+
+    /* ── Right column cards ────────────────────────────── */
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .causal-item {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(74,158,255,0.06);
+    }
+
+    .causal-item:last-child { border-bottom: none; }
+
+    .causal-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .causal-item-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+    }
+
+    .causal-item-pct {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px;
+      color: var(--accent);
+    }
+
+    .causal-bar-bg {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin-bottom: 5px;
+    }
+
+    .causal-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--cyan));
+      transition: width 0.9s ease;
+    }
+
+    .causal-desc {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      line-height: 1.5;
+    }
+
+    /* ── Trajectory canvas ─────────────────────────────── */
+    #trajectory-canvas {
+      display: block;
+      width: 100%;
+      height: 180px;
+    }
+
+    /* ── Incident timeline list ────────────────────────── */
+    .timeline-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 12px;
+      padding: 8px 0;
+      position: relative;
+    }
+
+    .timeline-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 0;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 16px;
+      width: 1px;
+      height: calc(100% - 8px);
+      background: rgba(74,158,255,0.1);
+    }
+
+    .timeline-item:last-child::before { display: none; }
+
+    .timeline-ts {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 1px;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .timeline-desc {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.5;
+    }
+
+    /* ── AI incident panel ─────────────────────────────── */
+    .ai-incident-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      margin-top: 2px;
+    }
+
+    .ai-incident-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ai-incident-body {
+      padding: 20px;
+      min-height: 120px;
+    }
+
+    .ai-incident-text {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      color: rgba(255,255,255,0.25);
+      font-style: italic;
+      line-height: 1.7;
+    }
+
+    .ai-incident-text.streaming {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 13px;
+      letter-spacing: 0;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.95;
+      font-style: normal;
+    }
+
+    .ai-incident-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .persona-mini-tabs {
+      display: flex;
+      gap: 4px;
+    }
+
+    .persona-mini-tab {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .persona-mini-tab.active {
+      color: rgba(255,255,255,0.8);
+      border-color: rgba(74,158,255,0.4);
+      background: rgba(74,158,255,0.08);
+    }
+
+    .btn-analyse {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      background: rgba(74,158,255,0.08);
+      border: 1px solid rgba(74,158,255,0.35);
+      color: #4a9eff;
+      padding: 8px 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-analyse:hover { background: rgba(74,158,255,0.15); }
+    .btn-analyse:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .cursor {
+      display: inline-block;
+      width: 1px;
+      height: 1em;
+      background: var(--accent);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    @media (max-width: 768px) {
+      .incident-header { grid-template-columns: 1fr; }
+      .incident-main   { grid-template-columns: 1fr; }
+      .inc-confidence-col { text-align: left; }
+      .causal-mini { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Sticky nav ─────────────────────────────────────────── -->
+<nav class="tl-nav">
+  <a href="index.html" class="tl-nav-logo">ARGUS</a>
+  <div class="tl-nav-center">
+    <span id="nav-breadcrumb" style="color:rgba(255,255,255,0.3);">
+      ARGUS / Dashboard / Incident –
+    </span>
+  </div>
+  <div class="tl-nav-right">
+    <a href="dashboard.html" class="btn-ghost">← Dashboard</a>
+  </div>
+</nav>
+
+<div class="incident-body">
+
+  <!-- ── Breadcrumb ──────────────────────────────────────── -->
+  <div class="breadcrumb fade-in-section">
+    <a href="index.html">ARGUS</a>
+    <span class="breadcrumb-sep">/</span>
+    <a href="dashboard.html">Dashboard</a>
+    <span class="breadcrumb-sep">/</span>
+    <span id="breadcrumb-id" style="color:rgba(255,255,255,0.5);">Incident –</span>
+  </div>
+
+  <!-- ── Incident header ─────────────────────────────────── -->
+  <div class="incident-header fade-in-section">
+    <div>
+      <div class="inc-badges" id="inc-badges"></div>
+      <div class="inc-title"  id="inc-title">–</div>
+      <span class="inc-timestamp" id="inc-timestamp">–</span>
+      <div class="vehicle-pills" id="vehicle-pills"></div>
+    </div>
+    <div class="inc-confidence-col">
+      <span class="inc-conf-value" id="inc-conf-value">–</span>
+      <span class="inc-conf-label">Confidence Score</span>
+      <div class="causal-mini" id="causal-mini"></div>
+    </div>
+  </div>
+
+  <!-- ── Main content ────────────────────────────────────── -->
+  <div class="incident-main">
+
+    <!-- Left: video + timeline -->
+    <div>
+      <div class="chart-card" style="padding:0;">
+        <div class="video-wrapper">
+          <video id="incident-video" controls muted preload="metadata"></video>
+          <div class="video-fallback" id="video-fallback" style="display:none;">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" opacity="0.15">
+              <rect x="4" y="10" width="30" height="28" stroke="white" stroke-width="1.5" fill="none"/>
+              <polygon points="34,24 44,18 44,30" fill="white"/>
+            </svg>
+            <span class="video-fallback-label">
+              Video file not found.<br>Place output_dashcam_annotated.mp4<br>in the trafficlens/ directory.
+            </span>
+          </div>
+          <canvas id="bbox-canvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Timeline bar -->
+      <div class="timeline-bar-wrap">
+        <div class="timeline-bar" id="timeline-bar" role="slider" aria-label="Video timeline">
+          <div class="timeline-bar-incident" id="timeline-incident-region"></div>
+          <div class="timeline-bar-cursor"   id="timeline-cursor" style="left:0%"></div>
+        </div>
+        <div class="timeline-bar-labels">
+          <span>T+00:00</span>
+          <span id="tbar-inc-start">–</span>
+          <span id="tbar-inc-end">–</span>
+          <span id="tbar-duration">–</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: analysis cards -->
+    <div class="right-col">
+
+      <!-- Causal analysis card -->
+      <div class="chart-card">
+        <span class="mono-label-accent" style="margin-bottom:16px;">Causal Factor Analysis</span>
+        <div style="font-family:'Cormorant Garamond',serif;font-weight:300;font-size:20px;letter-spacing:2px;color:#fff;margin-bottom:16px;">
+          Causal Analysis
+        </div>
+        <div id="causal-list"></div>
+      </div>
+
+      <!-- Vehicle trajectory card -->
+      <div class="chart-card">
+        <span class="mono-label-accent" style="margin-bottom:12px;">Vehicle Trajectories</span>
+        <canvas id="trajectory-canvas"></canvas>
+      </div>
+
+      <!-- Incident timeline list -->
+      <div class="chart-card">
+        <span class="mono-label-accent" style="margin-bottom:12px;">Event Timeline</span>
+        <div class="timeline-list" id="timeline-list"></div>
+      </div>
+
+    </div>
+  </div><!-- /.incident-main -->
+
+  <!-- ── AI incident analysis panel ─────────────────────── -->
+  <div class="ai-incident-panel fade-in-section">
+    <div class="ai-incident-header">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span class="ai-icon" style="font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--accent);border:1px solid rgba(74,158,255,0.35);padding:3px 7px;">AI</span>
+        <div>
+          <span style="font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:4px;color:rgba(255,255,255,0.3);text-transform:uppercase;display:block;margin-bottom:3px;">Incident Intelligence</span>
+          <span style="font-family:'Cormorant Garamond',serif;font-weight:300;font-size:18px;letter-spacing:2px;color:#fff;" id="ai-inc-id">–</span>
+        </div>
+      </div>
+      <span class="badge badge-info" id="ai-inc-persona-badge">Insurance Investigator</span>
+    </div>
+
+    <div class="ai-incident-body">
+      <div class="ai-incident-text" id="ai-incident-text">
+        Select persona and generate incident analysis.
+      </div>
+    </div>
+
+    <div class="ai-incident-footer">
+      <div class="persona-mini-tabs" id="persona-mini-tabs">
+        <button class="persona-mini-tab active" data-persona="insurance"  type="button">Insurance</button>
+        <button class="persona-mini-tab"         data-persona="engineer"   type="button">Engineer</button>
+        <button class="persona-mini-tab"         data-persona="researcher" type="button">Researcher</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-ghost" type="button">Add to Report</button>
+        <button class="btn-ghost" type="button">Flag for Review</button>
+        <button class="btn-ghost" type="button">Export Incident PDF</button>
+        <button class="btn-analyse" id="btn-analyse" type="button">Analyse Incident</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.incident-body -->
+
+<script type="module" src="js/incident.js"></script>
+</body>
+</html>

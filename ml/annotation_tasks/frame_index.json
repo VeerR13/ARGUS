@@ -1,0 +1,3002 @@
+{
+  "frame_00001.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 0,
+    "scenario": "night",
+    "seq": 1
+  },
+  "frame_00002.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 1,
+    "scenario": "night",
+    "seq": 2
+  },
+  "frame_00003.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 2,
+    "scenario": "night",
+    "seq": 3
+  },
+  "frame_00004.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 3,
+    "scenario": "night",
+    "seq": 4
+  },
+  "frame_00005.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 4,
+    "scenario": "night",
+    "seq": 5
+  },
+  "frame_00006.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 5,
+    "scenario": "night",
+    "seq": 6
+  },
+  "frame_00007.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 6,
+    "scenario": "night",
+    "seq": 7
+  },
+  "frame_00008.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 7,
+    "scenario": "night",
+    "seq": 8
+  },
+  "frame_00009.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 8,
+    "scenario": "night",
+    "seq": 9
+  },
+  "frame_00010.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 9,
+    "scenario": "night",
+    "seq": 10
+  },
+  "frame_00011.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 10,
+    "scenario": "night",
+    "seq": 11
+  },
+  "frame_00012.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 11,
+    "scenario": "night",
+    "seq": 12
+  },
+  "frame_00013.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 12,
+    "scenario": "night",
+    "seq": 13
+  },
+  "frame_00014.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 13,
+    "scenario": "night",
+    "seq": 14
+  },
+  "frame_00015.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 14,
+    "scenario": "night",
+    "seq": 15
+  },
+  "frame_00016.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 15,
+    "scenario": "night",
+    "seq": 16
+  },
+  "frame_00017.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 16,
+    "scenario": "night",
+    "seq": 17
+  },
+  "frame_00018.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 17,
+    "scenario": "night",
+    "seq": 18
+  },
+  "frame_00019.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 18,
+    "scenario": "night",
+    "seq": 19
+  },
+  "frame_00020.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 19,
+    "scenario": "night",
+    "seq": 20
+  },
+  "frame_00021.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 20,
+    "scenario": "night",
+    "seq": 21
+  },
+  "frame_00022.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 21,
+    "scenario": "night",
+    "seq": 22
+  },
+  "frame_00023.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 22,
+    "scenario": "night",
+    "seq": 23
+  },
+  "frame_00024.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 23,
+    "scenario": "night",
+    "seq": 24
+  },
+  "frame_00025.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 24,
+    "scenario": "night",
+    "seq": 25
+  },
+  "frame_00026.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 25,
+    "scenario": "night",
+    "seq": 26
+  },
+  "frame_00027.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 26,
+    "scenario": "night",
+    "seq": 27
+  },
+  "frame_00028.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 27,
+    "scenario": "night",
+    "seq": 28
+  },
+  "frame_00029.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 28,
+    "scenario": "night",
+    "seq": 29
+  },
+  "frame_00030.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 29,
+    "scenario": "night",
+    "seq": 30
+  },
+  "frame_00031.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 30,
+    "scenario": "night",
+    "seq": 31
+  },
+  "frame_00032.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 31,
+    "scenario": "night",
+    "seq": 32
+  },
+  "frame_00033.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 32,
+    "scenario": "night",
+    "seq": 33
+  },
+  "frame_00034.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 33,
+    "scenario": "night",
+    "seq": 34
+  },
+  "frame_00035.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 34,
+    "scenario": "night",
+    "seq": 35
+  },
+  "frame_00036.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 35,
+    "scenario": "night",
+    "seq": 36
+  },
+  "frame_00037.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 36,
+    "scenario": "night",
+    "seq": 37
+  },
+  "frame_00038.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 37,
+    "scenario": "night",
+    "seq": 38
+  },
+  "frame_00039.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 38,
+    "scenario": "night",
+    "seq": 39
+  },
+  "frame_00040.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 39,
+    "scenario": "night",
+    "seq": 40
+  },
+  "frame_00041.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 40,
+    "scenario": "night",
+    "seq": 41
+  },
+  "frame_00042.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 41,
+    "scenario": "night",
+    "seq": 42
+  },
+  "frame_00043.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 42,
+    "scenario": "night",
+    "seq": 43
+  },
+  "frame_00044.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 43,
+    "scenario": "night",
+    "seq": 44
+  },
+  "frame_00045.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 44,
+    "scenario": "night",
+    "seq": 45
+  },
+  "frame_00046.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 45,
+    "scenario": "night",
+    "seq": 46
+  },
+  "frame_00047.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 46,
+    "scenario": "night",
+    "seq": 47
+  },
+  "frame_00048.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 47,
+    "scenario": "night",
+    "seq": 48
+  },
+  "frame_00049.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 48,
+    "scenario": "night",
+    "seq": 49
+  },
+  "frame_00050.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 49,
+    "scenario": "night",
+    "seq": 50
+  },
+  "frame_00051.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 50,
+    "scenario": "night",
+    "seq": 51
+  },
+  "frame_00052.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 51,
+    "scenario": "night",
+    "seq": 52
+  },
+  "frame_00053.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 52,
+    "scenario": "night",
+    "seq": 53
+  },
+  "frame_00054.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 53,
+    "scenario": "night",
+    "seq": 54
+  },
+  "frame_00055.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 54,
+    "scenario": "night",
+    "seq": 55
+  },
+  "frame_00056.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 55,
+    "scenario": "night",
+    "seq": 56
+  },
+  "frame_00057.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 56,
+    "scenario": "night",
+    "seq": 57
+  },
+  "frame_00058.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 57,
+    "scenario": "night",
+    "seq": 58
+  },
+  "frame_00059.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 58,
+    "scenario": "night",
+    "seq": 59
+  },
+  "frame_00060.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 59,
+    "scenario": "night",
+    "seq": 60
+  },
+  "frame_00061.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 60,
+    "scenario": "night",
+    "seq": 61
+  },
+  "frame_00062.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 61,
+    "scenario": "night",
+    "seq": 62
+  },
+  "frame_00063.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 62,
+    "scenario": "night",
+    "seq": 63
+  },
+  "frame_00064.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 63,
+    "scenario": "night",
+    "seq": 64
+  },
+  "frame_00065.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 64,
+    "scenario": "night",
+    "seq": 65
+  },
+  "frame_00066.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 65,
+    "scenario": "night",
+    "seq": 66
+  },
+  "frame_00067.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 66,
+    "scenario": "night",
+    "seq": 67
+  },
+  "frame_00068.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 67,
+    "scenario": "night",
+    "seq": 68
+  },
+  "frame_00069.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 68,
+    "scenario": "night",
+    "seq": 69
+  },
+  "frame_00070.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 69,
+    "scenario": "night",
+    "seq": 70
+  },
+  "frame_00071.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 70,
+    "scenario": "night",
+    "seq": 71
+  },
+  "frame_00072.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 71,
+    "scenario": "night",
+    "seq": 72
+  },
+  "frame_00073.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 72,
+    "scenario": "night",
+    "seq": 73
+  },
+  "frame_00074.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 73,
+    "scenario": "night",
+    "seq": 74
+  },
+  "frame_00075.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 74,
+    "scenario": "night",
+    "seq": 75
+  },
+  "frame_00076.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 75,
+    "scenario": "night",
+    "seq": 76
+  },
+  "frame_00077.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 76,
+    "scenario": "night",
+    "seq": 77
+  },
+  "frame_00078.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 77,
+    "scenario": "night",
+    "seq": 78
+  },
+  "frame_00079.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 78,
+    "scenario": "night",
+    "seq": 79
+  },
+  "frame_00080.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 79,
+    "scenario": "night",
+    "seq": 80
+  },
+  "frame_00081.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 80,
+    "scenario": "night",
+    "seq": 81
+  },
+  "frame_00082.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 81,
+    "scenario": "night",
+    "seq": 82
+  },
+  "frame_00083.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 82,
+    "scenario": "night",
+    "seq": 83
+  },
+  "frame_00084.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 83,
+    "scenario": "night",
+    "seq": 84
+  },
+  "frame_00085.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 84,
+    "scenario": "night",
+    "seq": 85
+  },
+  "frame_00086.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 85,
+    "scenario": "night",
+    "seq": 86
+  },
+  "frame_00087.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 86,
+    "scenario": "night",
+    "seq": 87
+  },
+  "frame_00088.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 87,
+    "scenario": "night",
+    "seq": 88
+  },
+  "frame_00089.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 88,
+    "scenario": "night",
+    "seq": 89
+  },
+  "frame_00090.jpg": {
+    "source_video": "test_night_road_720p.mp4",
+    "source_frame": 89,
+    "scenario": "night",
+    "seq": 90
+  },
+  "frame_00091.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 0,
+    "scenario": "accident",
+    "seq": 91
+  },
+  "frame_00092.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 2,
+    "scenario": "accident",
+    "seq": 92
+  },
+  "frame_00093.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 4,
+    "scenario": "accident",
+    "seq": 93
+  },
+  "frame_00094.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 6,
+    "scenario": "accident",
+    "seq": 94
+  },
+  "frame_00095.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 8,
+    "scenario": "accident",
+    "seq": 95
+  },
+  "frame_00096.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 10,
+    "scenario": "accident",
+    "seq": 96
+  },
+  "frame_00097.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 12,
+    "scenario": "accident",
+    "seq": 97
+  },
+  "frame_00098.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 14,
+    "scenario": "accident",
+    "seq": 98
+  },
+  "frame_00099.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 16,
+    "scenario": "accident",
+    "seq": 99
+  },
+  "frame_00100.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 18,
+    "scenario": "accident",
+    "seq": 100
+  },
+  "frame_00101.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 20,
+    "scenario": "accident",
+    "seq": 101
+  },
+  "frame_00102.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 22,
+    "scenario": "accident",
+    "seq": 102
+  },
+  "frame_00103.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 24,
+    "scenario": "accident",
+    "seq": 103
+  },
+  "frame_00104.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 26,
+    "scenario": "accident",
+    "seq": 104
+  },
+  "frame_00105.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 28,
+    "scenario": "accident",
+    "seq": 105
+  },
+  "frame_00106.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 30,
+    "scenario": "accident",
+    "seq": 106
+  },
+  "frame_00107.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 32,
+    "scenario": "accident",
+    "seq": 107
+  },
+  "frame_00108.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 34,
+    "scenario": "accident",
+    "seq": 108
+  },
+  "frame_00109.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 36,
+    "scenario": "accident",
+    "seq": 109
+  },
+  "frame_00110.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 38,
+    "scenario": "accident",
+    "seq": 110
+  },
+  "frame_00111.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 40,
+    "scenario": "accident",
+    "seq": 111
+  },
+  "frame_00112.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 42,
+    "scenario": "accident",
+    "seq": 112
+  },
+  "frame_00113.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 44,
+    "scenario": "accident",
+    "seq": 113
+  },
+  "frame_00114.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 46,
+    "scenario": "accident",
+    "seq": 114
+  },
+  "frame_00115.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 48,
+    "scenario": "accident",
+    "seq": 115
+  },
+  "frame_00116.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 50,
+    "scenario": "accident",
+    "seq": 116
+  },
+  "frame_00117.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 52,
+    "scenario": "accident",
+    "seq": 117
+  },
+  "frame_00118.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 54,
+    "scenario": "accident",
+    "seq": 118
+  },
+  "frame_00119.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 56,
+    "scenario": "accident",
+    "seq": 119
+  },
+  "frame_00120.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 58,
+    "scenario": "accident",
+    "seq": 120
+  },
+  "frame_00121.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 60,
+    "scenario": "accident",
+    "seq": 121
+  },
+  "frame_00122.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 62,
+    "scenario": "accident",
+    "seq": 122
+  },
+  "frame_00123.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 64,
+    "scenario": "accident",
+    "seq": 123
+  },
+  "frame_00124.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 66,
+    "scenario": "accident",
+    "seq": 124
+  },
+  "frame_00125.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 68,
+    "scenario": "accident",
+    "seq": 125
+  },
+  "frame_00126.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 70,
+    "scenario": "accident",
+    "seq": 126
+  },
+  "frame_00127.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 72,
+    "scenario": "accident",
+    "seq": 127
+  },
+  "frame_00128.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 74,
+    "scenario": "accident",
+    "seq": 128
+  },
+  "frame_00129.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 76,
+    "scenario": "accident",
+    "seq": 129
+  },
+  "frame_00130.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 78,
+    "scenario": "accident",
+    "seq": 130
+  },
+  "frame_00131.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 80,
+    "scenario": "accident",
+    "seq": 131
+  },
+  "frame_00132.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 82,
+    "scenario": "accident",
+    "seq": 132
+  },
+  "frame_00133.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 84,
+    "scenario": "accident",
+    "seq": 133
+  },
+  "frame_00134.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 86,
+    "scenario": "accident",
+    "seq": 134
+  },
+  "frame_00135.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 88,
+    "scenario": "accident",
+    "seq": 135
+  },
+  "frame_00136.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 90,
+    "scenario": "accident",
+    "seq": 136
+  },
+  "frame_00137.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 92,
+    "scenario": "accident",
+    "seq": 137
+  },
+  "frame_00138.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 94,
+    "scenario": "accident",
+    "seq": 138
+  },
+  "frame_00139.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 96,
+    "scenario": "accident",
+    "seq": 139
+  },
+  "frame_00140.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 98,
+    "scenario": "accident",
+    "seq": 140
+  },
+  "frame_00141.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 100,
+    "scenario": "accident",
+    "seq": 141
+  },
+  "frame_00142.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 102,
+    "scenario": "accident",
+    "seq": 142
+  },
+  "frame_00143.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 104,
+    "scenario": "accident",
+    "seq": 143
+  },
+  "frame_00144.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 106,
+    "scenario": "accident",
+    "seq": 144
+  },
+  "frame_00145.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 108,
+    "scenario": "accident",
+    "seq": 145
+  },
+  "frame_00146.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 110,
+    "scenario": "accident",
+    "seq": 146
+  },
+  "frame_00147.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 112,
+    "scenario": "accident",
+    "seq": 147
+  },
+  "frame_00148.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 114,
+    "scenario": "accident",
+    "seq": 148
+  },
+  "frame_00149.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 116,
+    "scenario": "accident",
+    "seq": 149
+  },
+  "frame_00150.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 118,
+    "scenario": "accident",
+    "seq": 150
+  },
+  "frame_00151.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 120,
+    "scenario": "accident",
+    "seq": 151
+  },
+  "frame_00152.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 122,
+    "scenario": "accident",
+    "seq": 152
+  },
+  "frame_00153.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 124,
+    "scenario": "accident",
+    "seq": 153
+  },
+  "frame_00154.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 126,
+    "scenario": "accident",
+    "seq": 154
+  },
+  "frame_00155.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 128,
+    "scenario": "accident",
+    "seq": 155
+  },
+  "frame_00156.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 130,
+    "scenario": "accident",
+    "seq": 156
+  },
+  "frame_00157.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 132,
+    "scenario": "accident",
+    "seq": 157
+  },
+  "frame_00158.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 134,
+    "scenario": "accident",
+    "seq": 158
+  },
+  "frame_00159.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 136,
+    "scenario": "accident",
+    "seq": 159
+  },
+  "frame_00160.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 138,
+    "scenario": "accident",
+    "seq": 160
+  },
+  "frame_00161.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 140,
+    "scenario": "accident",
+    "seq": 161
+  },
+  "frame_00162.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 142,
+    "scenario": "accident",
+    "seq": 162
+  },
+  "frame_00163.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 144,
+    "scenario": "accident",
+    "seq": 163
+  },
+  "frame_00164.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 146,
+    "scenario": "accident",
+    "seq": 164
+  },
+  "frame_00165.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 148,
+    "scenario": "accident",
+    "seq": 165
+  },
+  "frame_00166.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 150,
+    "scenario": "accident",
+    "seq": 166
+  },
+  "frame_00167.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 152,
+    "scenario": "accident",
+    "seq": 167
+  },
+  "frame_00168.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 154,
+    "scenario": "accident",
+    "seq": 168
+  },
+  "frame_00169.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 156,
+    "scenario": "accident",
+    "seq": 169
+  },
+  "frame_00170.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 158,
+    "scenario": "accident",
+    "seq": 170
+  },
+  "frame_00171.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 160,
+    "scenario": "accident",
+    "seq": 171
+  },
+  "frame_00172.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 162,
+    "scenario": "accident",
+    "seq": 172
+  },
+  "frame_00173.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 164,
+    "scenario": "accident",
+    "seq": 173
+  },
+  "frame_00174.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 166,
+    "scenario": "accident",
+    "seq": 174
+  },
+  "frame_00175.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 168,
+    "scenario": "accident",
+    "seq": 175
+  },
+  "frame_00176.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 170,
+    "scenario": "accident",
+    "seq": 176
+  },
+  "frame_00177.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 172,
+    "scenario": "accident",
+    "seq": 177
+  },
+  "frame_00178.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 174,
+    "scenario": "accident",
+    "seq": 178
+  },
+  "frame_00179.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 176,
+    "scenario": "accident",
+    "seq": 179
+  },
+  "frame_00180.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 178,
+    "scenario": "accident",
+    "seq": 180
+  },
+  "frame_00181.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 180,
+    "scenario": "accident",
+    "seq": 181
+  },
+  "frame_00182.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 182,
+    "scenario": "accident",
+    "seq": 182
+  },
+  "frame_00183.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 184,
+    "scenario": "accident",
+    "seq": 183
+  },
+  "frame_00184.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 186,
+    "scenario": "accident",
+    "seq": 184
+  },
+  "frame_00185.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 188,
+    "scenario": "accident",
+    "seq": 185
+  },
+  "frame_00186.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 190,
+    "scenario": "accident",
+    "seq": 186
+  },
+  "frame_00187.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 192,
+    "scenario": "accident",
+    "seq": 187
+  },
+  "frame_00188.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 194,
+    "scenario": "accident",
+    "seq": 188
+  },
+  "frame_00189.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 196,
+    "scenario": "accident",
+    "seq": 189
+  },
+  "frame_00190.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 198,
+    "scenario": "accident",
+    "seq": 190
+  },
+  "frame_00191.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 200,
+    "scenario": "accident",
+    "seq": 191
+  },
+  "frame_00192.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 202,
+    "scenario": "accident",
+    "seq": 192
+  },
+  "frame_00193.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 204,
+    "scenario": "accident",
+    "seq": 193
+  },
+  "frame_00194.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 206,
+    "scenario": "accident",
+    "seq": 194
+  },
+  "frame_00195.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 208,
+    "scenario": "accident",
+    "seq": 195
+  },
+  "frame_00196.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 210,
+    "scenario": "accident",
+    "seq": 196
+  },
+  "frame_00197.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 212,
+    "scenario": "accident",
+    "seq": 197
+  },
+  "frame_00198.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 214,
+    "scenario": "accident",
+    "seq": 198
+  },
+  "frame_00199.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 216,
+    "scenario": "accident",
+    "seq": 199
+  },
+  "frame_00200.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 218,
+    "scenario": "accident",
+    "seq": 200
+  },
+  "frame_00201.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 220,
+    "scenario": "accident",
+    "seq": 201
+  },
+  "frame_00202.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 222,
+    "scenario": "accident",
+    "seq": 202
+  },
+  "frame_00203.jpg": {
+    "source_video": "test_accident_clip_1.mp4",
+    "source_frame": 224,
+    "scenario": "accident",
+    "seq": 203
+  },
+  "frame_00204.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 0,
+    "scenario": "accident",
+    "seq": 204
+  },
+  "frame_00205.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 2,
+    "scenario": "accident",
+    "seq": 205
+  },
+  "frame_00206.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 4,
+    "scenario": "accident",
+    "seq": 206
+  },
+  "frame_00207.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 6,
+    "scenario": "accident",
+    "seq": 207
+  },
+  "frame_00208.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 8,
+    "scenario": "accident",
+    "seq": 208
+  },
+  "frame_00209.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 10,
+    "scenario": "accident",
+    "seq": 209
+  },
+  "frame_00210.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 12,
+    "scenario": "accident",
+    "seq": 210
+  },
+  "frame_00211.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 14,
+    "scenario": "accident",
+    "seq": 211
+  },
+  "frame_00212.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 16,
+    "scenario": "accident",
+    "seq": 212
+  },
+  "frame_00213.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 18,
+    "scenario": "accident",
+    "seq": 213
+  },
+  "frame_00214.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 20,
+    "scenario": "accident",
+    "seq": 214
+  },
+  "frame_00215.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 22,
+    "scenario": "accident",
+    "seq": 215
+  },
+  "frame_00216.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 24,
+    "scenario": "accident",
+    "seq": 216
+  },
+  "frame_00217.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 26,
+    "scenario": "accident",
+    "seq": 217
+  },
+  "frame_00218.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 28,
+    "scenario": "accident",
+    "seq": 218
+  },
+  "frame_00219.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 30,
+    "scenario": "accident",
+    "seq": 219
+  },
+  "frame_00220.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 32,
+    "scenario": "accident",
+    "seq": 220
+  },
+  "frame_00221.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 34,
+    "scenario": "accident",
+    "seq": 221
+  },
+  "frame_00222.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 36,
+    "scenario": "accident",
+    "seq": 222
+  },
+  "frame_00223.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 38,
+    "scenario": "accident",
+    "seq": 223
+  },
+  "frame_00224.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 40,
+    "scenario": "accident",
+    "seq": 224
+  },
+  "frame_00225.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 42,
+    "scenario": "accident",
+    "seq": 225
+  },
+  "frame_00226.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 44,
+    "scenario": "accident",
+    "seq": 226
+  },
+  "frame_00227.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 46,
+    "scenario": "accident",
+    "seq": 227
+  },
+  "frame_00228.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 48,
+    "scenario": "accident",
+    "seq": 228
+  },
+  "frame_00229.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 50,
+    "scenario": "accident",
+    "seq": 229
+  },
+  "frame_00230.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 52,
+    "scenario": "accident",
+    "seq": 230
+  },
+  "frame_00231.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 54,
+    "scenario": "accident",
+    "seq": 231
+  },
+  "frame_00232.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 56,
+    "scenario": "accident",
+    "seq": 232
+  },
+  "frame_00233.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 58,
+    "scenario": "accident",
+    "seq": 233
+  },
+  "frame_00234.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 60,
+    "scenario": "accident",
+    "seq": 234
+  },
+  "frame_00235.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 62,
+    "scenario": "accident",
+    "seq": 235
+  },
+  "frame_00236.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 64,
+    "scenario": "accident",
+    "seq": 236
+  },
+  "frame_00237.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 66,
+    "scenario": "accident",
+    "seq": 237
+  },
+  "frame_00238.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 68,
+    "scenario": "accident",
+    "seq": 238
+  },
+  "frame_00239.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 70,
+    "scenario": "accident",
+    "seq": 239
+  },
+  "frame_00240.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 72,
+    "scenario": "accident",
+    "seq": 240
+  },
+  "frame_00241.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 74,
+    "scenario": "accident",
+    "seq": 241
+  },
+  "frame_00242.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 76,
+    "scenario": "accident",
+    "seq": 242
+  },
+  "frame_00243.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 78,
+    "scenario": "accident",
+    "seq": 243
+  },
+  "frame_00244.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 80,
+    "scenario": "accident",
+    "seq": 244
+  },
+  "frame_00245.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 82,
+    "scenario": "accident",
+    "seq": 245
+  },
+  "frame_00246.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 84,
+    "scenario": "accident",
+    "seq": 246
+  },
+  "frame_00247.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 86,
+    "scenario": "accident",
+    "seq": 247
+  },
+  "frame_00248.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 88,
+    "scenario": "accident",
+    "seq": 248
+  },
+  "frame_00249.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 90,
+    "scenario": "accident",
+    "seq": 249
+  },
+  "frame_00250.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 92,
+    "scenario": "accident",
+    "seq": 250
+  },
+  "frame_00251.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 94,
+    "scenario": "accident",
+    "seq": 251
+  },
+  "frame_00252.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 96,
+    "scenario": "accident",
+    "seq": 252
+  },
+  "frame_00253.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 98,
+    "scenario": "accident",
+    "seq": 253
+  },
+  "frame_00254.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 100,
+    "scenario": "accident",
+    "seq": 254
+  },
+  "frame_00255.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 102,
+    "scenario": "accident",
+    "seq": 255
+  },
+  "frame_00256.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 104,
+    "scenario": "accident",
+    "seq": 256
+  },
+  "frame_00257.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 106,
+    "scenario": "accident",
+    "seq": 257
+  },
+  "frame_00258.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 108,
+    "scenario": "accident",
+    "seq": 258
+  },
+  "frame_00259.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 110,
+    "scenario": "accident",
+    "seq": 259
+  },
+  "frame_00260.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 112,
+    "scenario": "accident",
+    "seq": 260
+  },
+  "frame_00261.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 114,
+    "scenario": "accident",
+    "seq": 261
+  },
+  "frame_00262.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 116,
+    "scenario": "accident",
+    "seq": 262
+  },
+  "frame_00263.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 118,
+    "scenario": "accident",
+    "seq": 263
+  },
+  "frame_00264.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 120,
+    "scenario": "accident",
+    "seq": 264
+  },
+  "frame_00265.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 122,
+    "scenario": "accident",
+    "seq": 265
+  },
+  "frame_00266.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 124,
+    "scenario": "accident",
+    "seq": 266
+  },
+  "frame_00267.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 126,
+    "scenario": "accident",
+    "seq": 267
+  },
+  "frame_00268.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 128,
+    "scenario": "accident",
+    "seq": 268
+  },
+  "frame_00269.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 130,
+    "scenario": "accident",
+    "seq": 269
+  },
+  "frame_00270.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 132,
+    "scenario": "accident",
+    "seq": 270
+  },
+  "frame_00271.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 134,
+    "scenario": "accident",
+    "seq": 271
+  },
+  "frame_00272.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 136,
+    "scenario": "accident",
+    "seq": 272
+  },
+  "frame_00273.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 138,
+    "scenario": "accident",
+    "seq": 273
+  },
+  "frame_00274.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 140,
+    "scenario": "accident",
+    "seq": 274
+  },
+  "frame_00275.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 142,
+    "scenario": "accident",
+    "seq": 275
+  },
+  "frame_00276.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 144,
+    "scenario": "accident",
+    "seq": 276
+  },
+  "frame_00277.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 146,
+    "scenario": "accident",
+    "seq": 277
+  },
+  "frame_00278.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 148,
+    "scenario": "accident",
+    "seq": 278
+  },
+  "frame_00279.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 150,
+    "scenario": "accident",
+    "seq": 279
+  },
+  "frame_00280.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 152,
+    "scenario": "accident",
+    "seq": 280
+  },
+  "frame_00281.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 154,
+    "scenario": "accident",
+    "seq": 281
+  },
+  "frame_00282.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 156,
+    "scenario": "accident",
+    "seq": 282
+  },
+  "frame_00283.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 158,
+    "scenario": "accident",
+    "seq": 283
+  },
+  "frame_00284.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 160,
+    "scenario": "accident",
+    "seq": 284
+  },
+  "frame_00285.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 162,
+    "scenario": "accident",
+    "seq": 285
+  },
+  "frame_00286.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 164,
+    "scenario": "accident",
+    "seq": 286
+  },
+  "frame_00287.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 166,
+    "scenario": "accident",
+    "seq": 287
+  },
+  "frame_00288.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 168,
+    "scenario": "accident",
+    "seq": 288
+  },
+  "frame_00289.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 170,
+    "scenario": "accident",
+    "seq": 289
+  },
+  "frame_00290.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 172,
+    "scenario": "accident",
+    "seq": 290
+  },
+  "frame_00291.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 174,
+    "scenario": "accident",
+    "seq": 291
+  },
+  "frame_00292.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 176,
+    "scenario": "accident",
+    "seq": 292
+  },
+  "frame_00293.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 178,
+    "scenario": "accident",
+    "seq": 293
+  },
+  "frame_00294.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 180,
+    "scenario": "accident",
+    "seq": 294
+  },
+  "frame_00295.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 182,
+    "scenario": "accident",
+    "seq": 295
+  },
+  "frame_00296.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 184,
+    "scenario": "accident",
+    "seq": 296
+  },
+  "frame_00297.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 186,
+    "scenario": "accident",
+    "seq": 297
+  },
+  "frame_00298.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 188,
+    "scenario": "accident",
+    "seq": 298
+  },
+  "frame_00299.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 190,
+    "scenario": "accident",
+    "seq": 299
+  },
+  "frame_00300.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 192,
+    "scenario": "accident",
+    "seq": 300
+  },
+  "frame_00301.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 194,
+    "scenario": "accident",
+    "seq": 301
+  },
+  "frame_00302.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 196,
+    "scenario": "accident",
+    "seq": 302
+  },
+  "frame_00303.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 198,
+    "scenario": "accident",
+    "seq": 303
+  },
+  "frame_00304.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 200,
+    "scenario": "accident",
+    "seq": 304
+  },
+  "frame_00305.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 202,
+    "scenario": "accident",
+    "seq": 305
+  },
+  "frame_00306.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 204,
+    "scenario": "accident",
+    "seq": 306
+  },
+  "frame_00307.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 206,
+    "scenario": "accident",
+    "seq": 307
+  },
+  "frame_00308.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 208,
+    "scenario": "accident",
+    "seq": 308
+  },
+  "frame_00309.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 210,
+    "scenario": "accident",
+    "seq": 309
+  },
+  "frame_00310.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 212,
+    "scenario": "accident",
+    "seq": 310
+  },
+  "frame_00311.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 214,
+    "scenario": "accident",
+    "seq": 311
+  },
+  "frame_00312.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 216,
+    "scenario": "accident",
+    "seq": 312
+  },
+  "frame_00313.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 218,
+    "scenario": "accident",
+    "seq": 313
+  },
+  "frame_00314.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 220,
+    "scenario": "accident",
+    "seq": 314
+  },
+  "frame_00315.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 222,
+    "scenario": "accident",
+    "seq": 315
+  },
+  "frame_00316.jpg": {
+    "source_video": "test_accident_clip_2.mp4",
+    "source_frame": 224,
+    "scenario": "accident",
+    "seq": 316
+  },
+  "frame_00317.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 0,
+    "scenario": "highway",
+    "seq": 317
+  },
+  "frame_00318.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 3,
+    "scenario": "highway",
+    "seq": 318
+  },
+  "frame_00319.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 6,
+    "scenario": "highway",
+    "seq": 319
+  },
+  "frame_00320.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 9,
+    "scenario": "highway",
+    "seq": 320
+  },
+  "frame_00321.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 12,
+    "scenario": "highway",
+    "seq": 321
+  },
+  "frame_00322.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 15,
+    "scenario": "highway",
+    "seq": 322
+  },
+  "frame_00323.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 18,
+    "scenario": "highway",
+    "seq": 323
+  },
+  "frame_00324.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 21,
+    "scenario": "highway",
+    "seq": 324
+  },
+  "frame_00325.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 24,
+    "scenario": "highway",
+    "seq": 325
+  },
+  "frame_00326.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 27,
+    "scenario": "highway",
+    "seq": 326
+  },
+  "frame_00327.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 30,
+    "scenario": "highway",
+    "seq": 327
+  },
+  "frame_00328.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 33,
+    "scenario": "highway",
+    "seq": 328
+  },
+  "frame_00329.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 36,
+    "scenario": "highway",
+    "seq": 329
+  },
+  "frame_00330.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 39,
+    "scenario": "highway",
+    "seq": 330
+  },
+  "frame_00331.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 42,
+    "scenario": "highway",
+    "seq": 331
+  },
+  "frame_00332.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 45,
+    "scenario": "highway",
+    "seq": 332
+  },
+  "frame_00333.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 48,
+    "scenario": "highway",
+    "seq": 333
+  },
+  "frame_00334.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 51,
+    "scenario": "highway",
+    "seq": 334
+  },
+  "frame_00335.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 54,
+    "scenario": "highway",
+    "seq": 335
+  },
+  "frame_00336.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 57,
+    "scenario": "highway",
+    "seq": 336
+  },
+  "frame_00337.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 60,
+    "scenario": "highway",
+    "seq": 337
+  },
+  "frame_00338.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 63,
+    "scenario": "highway",
+    "seq": 338
+  },
+  "frame_00339.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 66,
+    "scenario": "highway",
+    "seq": 339
+  },
+  "frame_00340.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 69,
+    "scenario": "highway",
+    "seq": 340
+  },
+  "frame_00341.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 72,
+    "scenario": "highway",
+    "seq": 341
+  },
+  "frame_00342.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 75,
+    "scenario": "highway",
+    "seq": 342
+  },
+  "frame_00343.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 78,
+    "scenario": "highway",
+    "seq": 343
+  },
+  "frame_00344.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 81,
+    "scenario": "highway",
+    "seq": 344
+  },
+  "frame_00345.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 84,
+    "scenario": "highway",
+    "seq": 345
+  },
+  "frame_00346.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 87,
+    "scenario": "highway",
+    "seq": 346
+  },
+  "frame_00347.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 90,
+    "scenario": "highway",
+    "seq": 347
+  },
+  "frame_00348.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 93,
+    "scenario": "highway",
+    "seq": 348
+  },
+  "frame_00349.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 96,
+    "scenario": "highway",
+    "seq": 349
+  },
+  "frame_00350.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 99,
+    "scenario": "highway",
+    "seq": 350
+  },
+  "frame_00351.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 102,
+    "scenario": "highway",
+    "seq": 351
+  },
+  "frame_00352.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 105,
+    "scenario": "highway",
+    "seq": 352
+  },
+  "frame_00353.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 108,
+    "scenario": "highway",
+    "seq": 353
+  },
+  "frame_00354.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 111,
+    "scenario": "highway",
+    "seq": 354
+  },
+  "frame_00355.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 114,
+    "scenario": "highway",
+    "seq": 355
+  },
+  "frame_00356.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 117,
+    "scenario": "highway",
+    "seq": 356
+  },
+  "frame_00357.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 120,
+    "scenario": "highway",
+    "seq": 357
+  },
+  "frame_00358.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 123,
+    "scenario": "highway",
+    "seq": 358
+  },
+  "frame_00359.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 126,
+    "scenario": "highway",
+    "seq": 359
+  },
+  "frame_00360.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 129,
+    "scenario": "highway",
+    "seq": 360
+  },
+  "frame_00361.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 132,
+    "scenario": "highway",
+    "seq": 361
+  },
+  "frame_00362.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 135,
+    "scenario": "highway",
+    "seq": 362
+  },
+  "frame_00363.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 138,
+    "scenario": "highway",
+    "seq": 363
+  },
+  "frame_00364.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 141,
+    "scenario": "highway",
+    "seq": 364
+  },
+  "frame_00365.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 144,
+    "scenario": "highway",
+    "seq": 365
+  },
+  "frame_00366.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 147,
+    "scenario": "highway",
+    "seq": 366
+  },
+  "frame_00367.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 150,
+    "scenario": "highway",
+    "seq": 367
+  },
+  "frame_00368.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 153,
+    "scenario": "highway",
+    "seq": 368
+  },
+  "frame_00369.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 156,
+    "scenario": "highway",
+    "seq": 369
+  },
+  "frame_00370.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 159,
+    "scenario": "highway",
+    "seq": 370
+  },
+  "frame_00371.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 162,
+    "scenario": "highway",
+    "seq": 371
+  },
+  "frame_00372.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 165,
+    "scenario": "highway",
+    "seq": 372
+  },
+  "frame_00373.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 168,
+    "scenario": "highway",
+    "seq": 373
+  },
+  "frame_00374.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 171,
+    "scenario": "highway",
+    "seq": 374
+  },
+  "frame_00375.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 174,
+    "scenario": "highway",
+    "seq": 375
+  },
+  "frame_00376.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 177,
+    "scenario": "highway",
+    "seq": 376
+  },
+  "frame_00377.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 180,
+    "scenario": "highway",
+    "seq": 377
+  },
+  "frame_00378.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 183,
+    "scenario": "highway",
+    "seq": 378
+  },
+  "frame_00379.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 186,
+    "scenario": "highway",
+    "seq": 379
+  },
+  "frame_00380.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 189,
+    "scenario": "highway",
+    "seq": 380
+  },
+  "frame_00381.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 192,
+    "scenario": "highway",
+    "seq": 381
+  },
+  "frame_00382.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 195,
+    "scenario": "highway",
+    "seq": 382
+  },
+  "frame_00383.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 198,
+    "scenario": "highway",
+    "seq": 383
+  },
+  "frame_00384.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 201,
+    "scenario": "highway",
+    "seq": 384
+  },
+  "frame_00385.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 204,
+    "scenario": "highway",
+    "seq": 385
+  },
+  "frame_00386.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 207,
+    "scenario": "highway",
+    "seq": 386
+  },
+  "frame_00387.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 210,
+    "scenario": "highway",
+    "seq": 387
+  },
+  "frame_00388.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 213,
+    "scenario": "highway",
+    "seq": 388
+  },
+  "frame_00389.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 216,
+    "scenario": "highway",
+    "seq": 389
+  },
+  "frame_00390.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 219,
+    "scenario": "highway",
+    "seq": 390
+  },
+  "frame_00391.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 222,
+    "scenario": "highway",
+    "seq": 391
+  },
+  "frame_00392.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 225,
+    "scenario": "highway",
+    "seq": 392
+  },
+  "frame_00393.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 228,
+    "scenario": "highway",
+    "seq": 393
+  },
+  "frame_00394.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 231,
+    "scenario": "highway",
+    "seq": 394
+  },
+  "frame_00395.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 234,
+    "scenario": "highway",
+    "seq": 395
+  },
+  "frame_00396.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 237,
+    "scenario": "highway",
+    "seq": 396
+  },
+  "frame_00397.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 240,
+    "scenario": "highway",
+    "seq": 397
+  },
+  "frame_00398.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 243,
+    "scenario": "highway",
+    "seq": 398
+  },
+  "frame_00399.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 246,
+    "scenario": "highway",
+    "seq": 399
+  },
+  "frame_00400.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 249,
+    "scenario": "highway",
+    "seq": 400
+  },
+  "frame_00401.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 252,
+    "scenario": "highway",
+    "seq": 401
+  },
+  "frame_00402.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 255,
+    "scenario": "highway",
+    "seq": 402
+  },
+  "frame_00403.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 258,
+    "scenario": "highway",
+    "seq": 403
+  },
+  "frame_00404.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 261,
+    "scenario": "highway",
+    "seq": 404
+  },
+  "frame_00405.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 264,
+    "scenario": "highway",
+    "seq": 405
+  },
+  "frame_00406.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 267,
+    "scenario": "highway",
+    "seq": 406
+  },
+  "frame_00407.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 0,
+    "scenario": "dashcam",
+    "seq": 407
+  },
+  "frame_00408.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 5,
+    "scenario": "dashcam",
+    "seq": 408
+  },
+  "frame_00409.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 10,
+    "scenario": "dashcam",
+    "seq": 409
+  },
+  "frame_00410.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 15,
+    "scenario": "dashcam",
+    "seq": 410
+  },
+  "frame_00411.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 20,
+    "scenario": "dashcam",
+    "seq": 411
+  },
+  "frame_00412.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 25,
+    "scenario": "dashcam",
+    "seq": 412
+  },
+  "frame_00413.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 30,
+    "scenario": "dashcam",
+    "seq": 413
+  },
+  "frame_00414.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 35,
+    "scenario": "dashcam",
+    "seq": 414
+  },
+  "frame_00415.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 40,
+    "scenario": "dashcam",
+    "seq": 415
+  },
+  "frame_00416.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 45,
+    "scenario": "dashcam",
+    "seq": 416
+  },
+  "frame_00417.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 50,
+    "scenario": "dashcam",
+    "seq": 417
+  },
+  "frame_00418.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 55,
+    "scenario": "dashcam",
+    "seq": 418
+  },
+  "frame_00419.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 60,
+    "scenario": "dashcam",
+    "seq": 419
+  },
+  "frame_00420.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 65,
+    "scenario": "dashcam",
+    "seq": 420
+  },
+  "frame_00421.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 70,
+    "scenario": "dashcam",
+    "seq": 421
+  },
+  "frame_00422.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 75,
+    "scenario": "dashcam",
+    "seq": 422
+  },
+  "frame_00423.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 80,
+    "scenario": "dashcam",
+    "seq": 423
+  },
+  "frame_00424.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 85,
+    "scenario": "dashcam",
+    "seq": 424
+  },
+  "frame_00425.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 90,
+    "scenario": "dashcam",
+    "seq": 425
+  },
+  "frame_00426.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 95,
+    "scenario": "dashcam",
+    "seq": 426
+  },
+  "frame_00427.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 100,
+    "scenario": "dashcam",
+    "seq": 427
+  },
+  "frame_00428.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 105,
+    "scenario": "dashcam",
+    "seq": 428
+  },
+  "frame_00429.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 110,
+    "scenario": "dashcam",
+    "seq": 429
+  },
+  "frame_00430.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 115,
+    "scenario": "dashcam",
+    "seq": 430
+  },
+  "frame_00431.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 120,
+    "scenario": "dashcam",
+    "seq": 431
+  },
+  "frame_00432.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 125,
+    "scenario": "dashcam",
+    "seq": 432
+  },
+  "frame_00433.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 130,
+    "scenario": "dashcam",
+    "seq": 433
+  },
+  "frame_00434.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 135,
+    "scenario": "dashcam",
+    "seq": 434
+  },
+  "frame_00435.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 140,
+    "scenario": "dashcam",
+    "seq": 435
+  },
+  "frame_00436.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 145,
+    "scenario": "dashcam",
+    "seq": 436
+  },
+  "frame_00437.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 150,
+    "scenario": "dashcam",
+    "seq": 437
+  },
+  "frame_00438.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 155,
+    "scenario": "dashcam",
+    "seq": 438
+  },
+  "frame_00439.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 160,
+    "scenario": "dashcam",
+    "seq": 439
+  },
+  "frame_00440.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 165,
+    "scenario": "dashcam",
+    "seq": 440
+  },
+  "frame_00441.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 170,
+    "scenario": "dashcam",
+    "seq": 441
+  },
+  "frame_00442.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 175,
+    "scenario": "dashcam",
+    "seq": 442
+  },
+  "frame_00443.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 180,
+    "scenario": "dashcam",
+    "seq": 443
+  },
+  "frame_00444.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 185,
+    "scenario": "dashcam",
+    "seq": 444
+  },
+  "frame_00445.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 190,
+    "scenario": "dashcam",
+    "seq": 445
+  },
+  "frame_00446.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 195,
+    "scenario": "dashcam",
+    "seq": 446
+  },
+  "frame_00447.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 200,
+    "scenario": "dashcam",
+    "seq": 447
+  },
+  "frame_00448.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 205,
+    "scenario": "dashcam",
+    "seq": 448
+  },
+  "frame_00449.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 210,
+    "scenario": "dashcam",
+    "seq": 449
+  },
+  "frame_00450.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 215,
+    "scenario": "dashcam",
+    "seq": 450
+  },
+  "frame_00451.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 220,
+    "scenario": "dashcam",
+    "seq": 451
+  },
+  "frame_00452.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 225,
+    "scenario": "dashcam",
+    "seq": 452
+  },
+  "frame_00453.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 230,
+    "scenario": "dashcam",
+    "seq": 453
+  },
+  "frame_00454.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 235,
+    "scenario": "dashcam",
+    "seq": 454
+  },
+  "frame_00455.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 240,
+    "scenario": "dashcam",
+    "seq": 455
+  },
+  "frame_00456.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 245,
+    "scenario": "dashcam",
+    "seq": 456
+  },
+  "frame_00457.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 250,
+    "scenario": "dashcam",
+    "seq": 457
+  },
+  "frame_00458.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 255,
+    "scenario": "dashcam",
+    "seq": 458
+  },
+  "frame_00459.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 260,
+    "scenario": "dashcam",
+    "seq": 459
+  },
+  "frame_00460.jpg": {
+    "source_video": "test_dashcam_30s_720p.mp4",
+    "source_frame": 265,
+    "scenario": "dashcam",
+    "seq": 460
+  },
+  "frame_00461.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 1,
+    "scenario": "highway",
+    "seq": 461
+  },
+  "frame_00462.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 2,
+    "scenario": "highway",
+    "seq": 462
+  },
+  "frame_00463.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 4,
+    "scenario": "highway",
+    "seq": 463
+  },
+  "frame_00464.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 5,
+    "scenario": "highway",
+    "seq": 464
+  },
+  "frame_00465.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 7,
+    "scenario": "highway",
+    "seq": 465
+  },
+  "frame_00466.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 8,
+    "scenario": "highway",
+    "seq": 466
+  },
+  "frame_00467.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 10,
+    "scenario": "highway",
+    "seq": 467
+  },
+  "frame_00468.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 11,
+    "scenario": "highway",
+    "seq": 468
+  },
+  "frame_00469.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 13,
+    "scenario": "highway",
+    "seq": 469
+  },
+  "frame_00470.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 14,
+    "scenario": "highway",
+    "seq": 470
+  },
+  "frame_00471.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 16,
+    "scenario": "highway",
+    "seq": 471
+  },
+  "frame_00472.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 17,
+    "scenario": "highway",
+    "seq": 472
+  },
+  "frame_00473.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 19,
+    "scenario": "highway",
+    "seq": 473
+  },
+  "frame_00474.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 20,
+    "scenario": "highway",
+    "seq": 474
+  },
+  "frame_00475.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 22,
+    "scenario": "highway",
+    "seq": 475
+  },
+  "frame_00476.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 23,
+    "scenario": "highway",
+    "seq": 476
+  },
+  "frame_00477.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 25,
+    "scenario": "highway",
+    "seq": 477
+  },
+  "frame_00478.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 26,
+    "scenario": "highway",
+    "seq": 478
+  },
+  "frame_00479.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 28,
+    "scenario": "highway",
+    "seq": 479
+  },
+  "frame_00480.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 29,
+    "scenario": "highway",
+    "seq": 480
+  },
+  "frame_00481.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 31,
+    "scenario": "highway",
+    "seq": 481
+  },
+  "frame_00482.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 32,
+    "scenario": "highway",
+    "seq": 482
+  },
+  "frame_00483.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 34,
+    "scenario": "highway",
+    "seq": 483
+  },
+  "frame_00484.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 35,
+    "scenario": "highway",
+    "seq": 484
+  },
+  "frame_00485.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 37,
+    "scenario": "highway",
+    "seq": 485
+  },
+  "frame_00486.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 38,
+    "scenario": "highway",
+    "seq": 486
+  },
+  "frame_00487.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 40,
+    "scenario": "highway",
+    "seq": 487
+  },
+  "frame_00488.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 41,
+    "scenario": "highway",
+    "seq": 488
+  },
+  "frame_00489.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 43,
+    "scenario": "highway",
+    "seq": 489
+  },
+  "frame_00490.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 44,
+    "scenario": "highway",
+    "seq": 490
+  },
+  "frame_00491.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 46,
+    "scenario": "highway",
+    "seq": 491
+  },
+  "frame_00492.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 47,
+    "scenario": "highway",
+    "seq": 492
+  },
+  "frame_00493.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 49,
+    "scenario": "highway",
+    "seq": 493
+  },
+  "frame_00494.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 50,
+    "scenario": "highway",
+    "seq": 494
+  },
+  "frame_00495.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 52,
+    "scenario": "highway",
+    "seq": 495
+  },
+  "frame_00496.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 53,
+    "scenario": "highway",
+    "seq": 496
+  },
+  "frame_00497.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 55,
+    "scenario": "highway",
+    "seq": 497
+  },
+  "frame_00498.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 56,
+    "scenario": "highway",
+    "seq": 498
+  },
+  "frame_00499.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 58,
+    "scenario": "highway",
+    "seq": 499
+  },
+  "frame_00500.jpg": {
+    "source_video": "test_highway_30s_720p.mp4",
+    "source_frame": 59,
+    "scenario": "highway",
+    "seq": 500
+  }
+}

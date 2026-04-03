@@ -1,0 +1,44 @@
+{
+  "generated": "2026-03-27",
+  "summary": "Week 3 retrain comparison: yolov8n fine-tuned vs yolov8s.pt baseline",
+  "training": {
+    "base_model": "yolov8n.pt",
+    "output_model": "models/week2_retrained.pt",
+    "epochs": 30,
+    "best_epoch": 27,
+    "dataset": {
+      "positives": 438,
+      "hard_negatives": 663,
+      "total": 1101
+    },
+    "best_metrics": {
+      "mAP50": 0.7815,
+      "mAP50_95": 0.5714,
+      "precision": 0.811,
+      "recall": 0.7435
+    }
+  },
+  "detection_comparison": {
+    "video": "accident_clip_1.mp4 (50-frame sample)",
+    "baseline_yolov8s": {
+      "avg_detections_per_frame": 3.54,
+      "max_detections_frame": 5,
+      "incident_detection": {
+        "total_incidents": 14,
+        "accidents": 6,
+        "near_misses": 8
+      }
+    },
+    "retrained_yolov8n": {
+      "avg_detections_per_frame": 2.0,
+      "max_detections_frame": 3,
+      "incident_detection": "pending (class filter bug fixed, full eval not yet run)"
+    }
+  },
+  "verdict": {
+    "production_model": "yolov8s.pt",
+    "reason": "yolov8n fine-tuned shows lower recall (2.0 vs 3.54 dets/frame) on unseen footage. yolov8n is a smaller architecture \u2014 fine-tuning on 1,101 samples did not overcome the capacity gap. Custom model useful for future transfer learning with more annotations.",
+    "retrained_model_utility": "Retrained model has better class-name labels (car/motorcycle/bus/truck vs COCO IDs) and can serve as a starting point for Week 4 annotation-driven fine-tuning.",
+    "incident_detection": "yolov8s.pt + updated interaction.py (F6 removed, F4=4 frames, dense relaxed) detects all 5 video cases correctly."
+  }
+}

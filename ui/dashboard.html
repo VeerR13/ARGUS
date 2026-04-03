@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARGUS — Analysis Dashboard</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    body { overflow-x: hidden; }
+
+    /* ── Layout ─────────────────────────────────────────── */
+    .dashboard-body {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 32px 28px 80px;
+    }
+
+    /* ── Report header ──────────────────────────────────── */
+    .report-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 20px;
+    }
+
+    .report-header-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 30px;
+      letter-spacing: 3px;
+      color: #fff;
+      margin-top: 6px;
+    }
+
+    .report-header-chips {
+      display: flex;
+      gap: 8px;
+    }
+
+    .meta-chip {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+    }
+
+    /* ── File info bar ──────────────────────────────────── */
+    .file-info-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      margin-bottom: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 2px solid var(--accent);
+    }
+
+    .file-info-icon {
+      color: rgba(74,158,255,0.5);
+      flex-shrink: 0;
+    }
+
+    .file-info-name {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.6);
+      flex: 1;
+    }
+
+    .file-info-meta {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.25);
+      text-transform: uppercase;
+      display: flex;
+      gap: 16px;
+    }
+
+    /* ── Stats grid ─────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      margin-bottom: 24px;
+    }
+
+    /* ── Persona switcher ───────────────────────────────── */
+    .persona-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2px;
+    }
+
+    .persona-tab {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      padding: 12px 20px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+
+    .persona-tab:hover { color: rgba(255,255,255,0.6); }
+
+    .persona-tab.active {
+      color: rgba(255,255,255,0.9);
+      border-bottom-color: var(--accent);
+      background: rgba(74,158,255,0.08);
+    }
+
+    /* ── Chart sections ─────────────────────────────────── */
+    .chart-section {
+      margin-bottom: 2px;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 20px;
+    }
+
+    canvas.chart-canvas {
+      display: block;
+      width: 100%;
+    }
+
+    /* Flow chart full width */
+    #flow-chart { height: 150px; }
+
+    /* Row 2: 3 columns */
+    .chart-row-2 {
+      display: grid;
+      grid-template-columns: 2fr 1.4fr 1.4fr;
+      gap: 2px;
+      margin-bottom: 2px;
+    }
+
+    #speed-chart    { height: 190px; }
+    #donut-chart    { height: 190px; }
+    #lane-chart     { height: 190px; }
+
+    /* Row 3: 2 columns */
+    .chart-row-3 {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 2px;
+      margin-bottom: 24px;
+    }
+
+    #heatmap-chart  { height: 160px; }
+
+    /* Anomaly log */
+    .anomaly-log {
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .anomaly-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(74,158,255,0.06);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .anomaly-row:hover { background: rgba(74,158,255,0.04); margin: 0 -8px; padding: 9px 8px; }
+    .anomaly-row:last-child { border-bottom: none; }
+
+    .anomaly-ts {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 1px;
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 1px;
+      white-space: nowrap;
+    }
+
+    .anomaly-desc {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.5;
+      flex: 1;
+    }
+
+    /* ── Confidence bars ────────────────────────────────── */
+    .confidence-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-bottom: 24px;
+    }
+
+    .conf-bar-bg {
+      height: 2px;
+      background: rgba(255,255,255,0.06);
+      margin-top: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .conf-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--cyan));
+      transition: width 1.2s ease;
+    }
+
+    .conf-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 36px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    /* ── AI Analysis panel ──────────────────────────────── */
+    .ai-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .ai-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ai-icon {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      border: 1px solid rgba(74,158,255,0.35);
+      padding: 3px 7px;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .ai-panel-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .ai-panel-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+
+    .ai-panel-chips {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .ai-panel-body {
+      display: grid;
+      grid-template-columns: 60% 40%;
+      gap: 0;
+      padding: 0;
+    }
+
+    .ai-text-col {
+      padding: 22px;
+      border-right: 1px solid var(--border);
+    }
+
+    .ai-text-area {
+      min-height: 120px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.25);
+      font-style: italic;
+      line-height: 1.7;
+    }
+
+    .ai-text-area.streaming {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 13px;
+      letter-spacing: 0;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.95;
+      font-style: normal;
+    }
+
+    .ai-meta-col {
+      padding: 22px;
+    }
+
+    .ai-metrics-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .ai-metrics-table td {
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(74,158,255,0.06);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 11px;
+    }
+
+    .ai-metrics-table td:first-child {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.25);
+      text-transform: uppercase;
+    }
+
+    .ai-metrics-table td:last-child {
+      text-align: right;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .ai-rec-item {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      padding: 5px 0;
+      padding-left: 16px;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .ai-rec-item::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 10px;
+    }
+
+    .ai-panel-footer {
+      padding: 16px 22px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-generate {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      background: rgba(74,158,255,0.08);
+      border: 1px solid rgba(74,158,255,0.35);
+      color: #4a9eff;
+      padding: 12px;
+      width: 100%;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-generate:hover { background: rgba(74,158,255,0.15); }
+
+    .btn-generate:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* ── Finding cards ──────────────────────────────────── */
+    .finding-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-bottom: 24px;
+    }
+
+    .finding-number {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 3px;
+      color: rgba(74,158,255,0.4);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .finding-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 38px;
+      color: #fff;
+      line-height: 1;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .finding-label {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.5;
+    }
+
+    /* ── Dashboard footer ───────────────────────────────── */
+    .dashboard-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 20px;
+      border-top: 1px solid rgba(74,158,255,0.08);
+      margin-top: 40px;
+    }
+
+    .dashboard-footer-left {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+    }
+
+    .dashboard-footer-right {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* ── Cursor blink for typewriter ────────────────────── */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 1px;
+      height: 1em;
+      background: var(--accent);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+
+    /* ── Responsive ─────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .chart-row-2, .chart-row-3, .confidence-grid, .finding-grid {
+        grid-template-columns: 1fr;
+      }
+      .ai-panel-body {
+        grid-template-columns: 1fr;
+      }
+      .ai-text-col { border-right: none; border-bottom: 1px solid var(--border); }
+      .report-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .dashboard-footer { flex-direction: column; gap: 16px; align-items: flex-start; }
+      .file-info-meta { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Sticky nav ─────────────────────────────────────────── -->
+<nav class="tl-nav">
+  <a href="index.html" class="tl-nav-logo">ARGUS</a>
+
+  <div class="tl-nav-center">
+    <div class="tl-nav-status-dot"></div>
+    <span id="nav-status">Analysis Complete</span>
+    <span style="color:rgba(74,158,255,0.3)">·</span>
+    <span id="nav-filename" style="color:rgba(255,255,255,0.3)">–</span>
+  </div>
+
+  <div class="tl-nav-right">
+    <a href="index.html" class="btn-ghost">← New Analysis</a>
+  </div>
+</nav>
+
+<div class="dashboard-body">
+
+  <!-- ── Report header ──────────────────────────────────── -->
+  <div class="report-header fade-in-section">
+    <div>
+      <span class="mono-label-accent" id="session-label">RESEARCH OUTPUT / SESSION 0x0000</span>
+      <div class="report-header-title">Traffic Dynamics Report</div>
+    </div>
+    <div class="report-header-chips">
+      <div class="meta-chip" id="chip-duration">–</div>
+      <div class="meta-chip" id="chip-resolution">–</div>
+    </div>
+  </div>
+
+  <!-- ── File info bar ──────────────────────────────────── -->
+  <div class="file-info-bar fade-in-section">
+    <svg class="file-info-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <polygon points="7,1 13,4 13,10 7,13 1,10 1,4" stroke="#4a9eff" stroke-width="0.8" fill="none"/>
+      <circle cx="7" cy="7" r="2" fill="rgba(74,158,255,0.4)"/>
+    </svg>
+    <span class="file-info-name" id="file-info-name">–</span>
+    <div class="file-info-meta">
+      <span id="file-fps">– fps</span>
+      <span id="file-resolution">–</span>
+      <span id="file-processing">–s processing</span>
+    </div>
+  </div>
+
+  <!-- ── Metrics strip ──────────────────────────────────── -->
+  <div class="stats-grid fade-in-section">
+    <div class="stat-card tl-card-accent tl-card-accent-blue">
+      <span class="stat-label">Total Vehicles</span>
+      <span class="stat-value" id="stat-vehicles">–</span>
+      <span class="stat-unit" style="color:var(--accent)">Detected</span>
+      <span class="stat-delta stat-delta-bad">↑ 12.4% above baseline</span>
+    </div>
+    <div class="stat-card tl-card-accent tl-card-accent-green">
+      <span class="stat-label">Avg Speed</span>
+      <span class="stat-value" id="stat-speed">–</span>
+      <span class="stat-unit" style="color:var(--green)">KM / H</span>
+      <span class="stat-delta stat-delta-good">↓ 8.1% below limit</span>
+    </div>
+    <div class="stat-card tl-card-accent tl-card-accent-amber">
+      <span class="stat-label">Congestion</span>
+      <span class="stat-value" id="stat-congestion">–</span>
+      <span class="stat-unit" style="color:var(--amber)">Out of 10</span>
+      <span class="stat-delta stat-delta-warn">↑ Moderate–High</span>
+    </div>
+    <div class="stat-card tl-card-accent tl-card-accent-red">
+      <span class="stat-label">Anomalies</span>
+      <span class="stat-value" id="stat-anomalies">–</span>
+      <span class="stat-unit" style="color:var(--red)">Flagged</span>
+      <span class="stat-delta stat-delta-bad" id="stat-critical-count">↑ – events critical</span>
+    </div>
+  </div>
+
+  <!-- ── Persona switcher ───────────────────────────────── -->
+  <div class="persona-tabs fade-in-section" role="tablist">
+    <button class="persona-tab active" data-persona="insurance"  role="tab">Insurance Investigator</button>
+    <button class="persona-tab"        data-persona="engineer"   role="tab">Traffic Engineer</button>
+    <button class="persona-tab"        data-persona="researcher" role="tab">Road Safety Researcher</button>
+  </div>
+
+  <!-- ── Flow timeline (full width) ────────────────────── -->
+  <div class="chart-card chart-section fade-in-section">
+    <span class="mono-label-accent">Vehicle Flow — Vehicles per Minute</span>
+    <canvas id="flow-chart" class="chart-canvas"></canvas>
+  </div>
+
+  <!-- ── Chart row 2 ────────────────────────────────────── -->
+  <div class="chart-row-2 fade-in-section">
+    <div class="chart-card">
+      <span class="mono-label">Speed Distribution</span>
+      <canvas id="speed-chart" class="chart-canvas"></canvas>
+    </div>
+    <div class="chart-card">
+      <span class="mono-label">Vehicle Composition</span>
+      <canvas id="donut-chart" class="chart-canvas"></canvas>
+    </div>
+    <div class="chart-card">
+      <span class="mono-label">Lane Utilization</span>
+      <canvas id="lane-chart" class="chart-canvas"></canvas>
+    </div>
+  </div>
+
+  <!-- ── Chart row 3 ────────────────────────────────────── -->
+  <div class="chart-row-3 fade-in-section">
+    <div class="chart-card">
+      <span class="mono-label">Congestion Heatmap — 4 Lanes × Time</span>
+      <canvas id="heatmap-chart" class="chart-canvas"></canvas>
+    </div>
+    <div class="chart-card">
+      <span class="mono-label">Anomaly Event Log</span>
+      <div class="anomaly-log" id="anomaly-log"></div>
+    </div>
+  </div>
+
+  <!-- ── Confidence metrics ─────────────────────────────── -->
+  <div class="confidence-grid fade-in-section">
+    <div class="tl-card">
+      <span class="stat-label">Detection Confidence</span>
+      <span class="conf-value" id="conf-detection">–</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(255,255,255,0.2)">%</span>
+      <div class="conf-bar-bg">
+        <div class="conf-bar-fill" id="conf-bar-detection"></div>
+      </div>
+    </div>
+    <div class="tl-card">
+      <span class="stat-label">Tracking Accuracy</span>
+      <span class="conf-value" id="conf-tracking">–</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(255,255,255,0.2)">%</span>
+      <div class="conf-bar-bg">
+        <div class="conf-bar-fill" id="conf-bar-tracking"></div>
+      </div>
+    </div>
+    <div class="tl-card">
+      <span class="stat-label">Classification Precision</span>
+      <span class="conf-value" id="conf-class">–</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(255,255,255,0.2)">%</span>
+      <div class="conf-bar-bg">
+        <div class="conf-bar-fill" id="conf-bar-class"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AI Analysis panel ─────────────────────────────── -->
+  <div class="ai-panel fade-in-section">
+    <div class="ai-panel-header">
+      <div style="display:flex;align-items:center;">
+        <span class="ai-icon">AI</span>
+        <div>
+          <span class="ai-panel-label">Neural Analysis Output</span>
+          <span class="ai-panel-title">Automated Research Findings</span>
+        </div>
+      </div>
+      <div class="ai-panel-chips">
+        <span class="badge badge-info" id="ai-persona-badge">Insurance Investigator</span>
+        <span class="meta-chip">Model: claude-sonnet</span>
+      </div>
+    </div>
+
+    <div class="ai-panel-body">
+      <div class="ai-text-col">
+        <div class="ai-text-area" id="ai-text-area">
+          Click 'Generate Analysis' to produce AI-powered insights for the selected persona.
+        </div>
+        <div class="ai-panel-footer" style="padding:16px 0 0 0; border-top: 1px solid var(--border); margin-top:16px;">
+          <button class="btn-generate" id="btn-generate" type="button">Generate Analysis</button>
+        </div>
+      </div>
+      <div class="ai-meta-col">
+        <span class="mono-label" style="margin-bottom:10px;">Key Metrics</span>
+        <table class="ai-metrics-table">
+          <tr><td>Peak Flow</td>     <td id="metric-peak-flow">–</td></tr>
+          <tr><td>Min Headway</td>   <td id="metric-min-headway">–</td></tr>
+          <tr><td>Max Speed</td>     <td id="metric-max-speed">–</td></tr>
+          <tr><td>Detection FPS</td> <td id="metric-fps">–</td></tr>
+          <tr><td>Track Loss Rate</td><td id="metric-track-loss">–</td></tr>
+          <tr><td>Avg Dwell</td>     <td id="metric-avg-dwell">–</td></tr>
+        </table>
+        <span class="mono-label" style="margin-bottom:10px;">Recommendations</span>
+        <div id="ai-recommendations"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Finding cards ──────────────────────────────────── -->
+  <div class="finding-grid fade-in-section">
+    <div class="tl-card">
+      <span class="finding-number">Finding 01</span>
+      <span class="finding-value" id="finding-peak-flow">–</span>
+      <span class="finding-label" id="finding-peak-label">Peak flow computation pending…</span>
+    </div>
+    <div class="tl-card">
+      <span class="finding-number">Finding 02</span>
+      <span class="finding-value" id="finding-lane-excess">–</span>
+      <span class="finding-label" id="finding-lane-label">Lane utilisation analysis pending…</span>
+    </div>
+    <div class="tl-card">
+      <span class="finding-number">Finding 03</span>
+      <span class="finding-value" id="finding-critical">–</span>
+      <span class="finding-label">Critical-severity events requiring immediate review and possible intervention</span>
+    </div>
+  </div>
+
+  <!-- ── Dashboard footer ───────────────────────────────── -->
+  <div class="dashboard-footer fade-in-section">
+    <div class="dashboard-footer-left" id="footer-session">
+      Session – · Processed in –s · ARGUS-v2.1
+    </div>
+    <div class="dashboard-footer-right">
+      <button class="btn-ghost" id="btn-export-csv" type="button">Export CSV</button>
+      <button class="btn-ghost" id="btn-export-pdf" type="button">Export PDF</button>
+      <button class="btn-ghost" type="button">Share Report</button>
+    </div>
+  </div>
+
+</div><!-- /.dashboard-body -->
+
+<!-- ── Q&A Chat panel ─────────────────────────────────────── -->
+<button class="chat-toggle" id="chat-toggle" type="button" aria-label="Open AI assistant"
+  style="
+    position:fixed; bottom:28px; right:28px; z-index:300;
+    width:48px; height:48px;
+    background:#0a1520; border:1px solid rgba(74,158,255,0.35);
+    border-radius:0; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition: border-color 0.2s;
+  ">
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+    <path d="M3 4h14v9H3z" stroke="#4a9eff" stroke-width="1" fill="none"/>
+    <path d="M6 16l2-3h6" stroke="#4a9eff" stroke-width="1" fill="none"/>
+  </svg>
+</button>
+
+<div id="chat-panel" style="
+  position:fixed; bottom:90px; right:28px; z-index:300;
+  width:360px; height:480px;
+  background:#0a1520; border:1px solid rgba(74,158,255,0.2);
+  display:none; flex-direction:column;
+">
+  <div style="
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 16px; border-bottom:1px solid var(--border);
+  ">
+    <span style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,0.4);text-transform:uppercase;">
+      Ask About This Footage
+    </span>
+    <button id="chat-close" type="button" style="
+      background:none; border:none; color:rgba(255,255,255,0.3);
+      cursor:pointer; font-size:16px; line-height:1; padding:0;
+    ">×</button>
+  </div>
+  <div id="chat-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;">
+    <div class="chat-ai-msg" style="
+      background:rgba(74,158,255,0.06); border-left:2px solid #4a9eff;
+      padding:10px 12px; font-family:'Barlow',sans-serif; font-weight:300;
+      font-size:12px; color:rgba(255,255,255,0.6); line-height:1.7;
+    ">
+      I have analysed the footage and identified 9 incidents including 2 accidents. Ask me anything about specific vehicles, timing of events, or recommendations.
+    </div>
+    <div id="chat-suggestions" style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+      <button class="chat-suggestion" data-q="What caused the T+00:47 incident?" type="button">What caused the T+00:47 incident?</button>
+      <button class="chat-suggestion" data-q="Which lane has the highest risk?" type="button">Which lane has the highest risk?</button>
+      <button class="chat-suggestion" data-q="What are the top recommendations?" type="button">What are the top recommendations?</button>
+    </div>
+  </div>
+  <div style="
+    display:flex; gap:8px; padding:12px;
+    border-top:1px solid var(--border);
+  ">
+    <input id="chat-input" type="text" placeholder="Ask about the footage…" style="
+      flex:1; background:#06090f; border:1px solid rgba(74,158,255,0.2);
+      color:rgba(255,255,255,0.8); padding:8px 12px;
+      font-family:'Barlow',sans-serif; font-weight:300; font-size:12px;
+      border-radius:0; outline:none;
+    " />
+    <button id="chat-send" type="button" style="
+      font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:2px;
+      background:rgba(74,158,255,0.1); border:1px solid rgba(74,158,255,0.3);
+      color:#4a9eff; padding:8px 14px; cursor:pointer; text-transform:uppercase;
+    ">Send</button>
+  </div>
+</div>
+
+<style>
+  .chat-suggestion {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 1.5px;
+    border: 1px solid rgba(74,158,255,0.2);
+    padding: 5px 12px;
+    color: rgba(255,255,255,0.4);
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: color 0.15s, border-color 0.15s;
+    border-radius: 0;
+    text-transform: uppercase;
+  }
+  .chat-suggestion:hover { color: #4a9eff; border-color: rgba(74,158,255,0.4); }
+</style>
+
+<script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

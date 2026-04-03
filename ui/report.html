@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARGUS — Analysis Report</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    .report-body {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 32px 28px 80px;
+    }
+
+    /* ── Report cover ──────────────────────────────────── */
+    .report-cover {
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+    }
+
+    .report-cover-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+
+    .report-cover-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 14px;
+      letter-spacing: 6px;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+    }
+
+    .report-cover-date {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.25);
+    }
+
+    .report-cover-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 42px;
+      letter-spacing: 4px;
+      color: #fff;
+      margin-bottom: 32px;
+    }
+
+    .report-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-bottom: 20px;
+    }
+
+    .report-meta-cell {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+    }
+
+    .report-meta-cell-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .report-meta-cell-value {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 13px;
+      color: rgba(255,255,255,0.65);
+    }
+
+    .report-persona-badge {
+      display: inline-block;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      text-transform: uppercase;
+      background: rgba(74,158,255,0.08);
+      border: 1px solid rgba(74,158,255,0.25);
+      padding: 5px 12px;
+    }
+
+    /* ── Section labels ────────────────────────────────── */
+    .section-eyebrow {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 5px;
+      color: #4a9eff;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      margin-top: 48px;
+      display: block;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(74,158,255,0.1);
+    }
+
+    /* ── AI text areas ─────────────────────────────────── */
+    .ai-stream-area {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 14px;
+      line-height: 2.0;
+      color: rgba(255,255,255,0.65);
+      min-height: 80px;
+    }
+
+    .ai-stream-area.loading {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.2);
+      font-style: italic;
+    }
+
+    /* ── Key stats mini ────────────────────────────────── */
+    .report-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      margin-top: 24px;
+    }
+
+    .report-stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 16px;
+      text-align: center;
+    }
+
+    .report-stat-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .report-stat-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 32px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    /* ── Incident items ────────────────────────────────── */
+    .report-incident {
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(74,158,255,0.06);
+    }
+
+    .report-incident:last-child { border-bottom: none; }
+
+    .report-incident-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .report-incident-id {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 2px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .report-incident-ts {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.25);
+    }
+
+    .report-incident-text {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 13px;
+      line-height: 1.9;
+      color: rgba(255,255,255,0.5);
+      min-height: 20px;
+    }
+
+    .report-incident-footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .report-incident-conf {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+    }
+
+    /* ── Risk gauge ────────────────────────────────────── */
+    .risk-section {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .risk-gauge-wrap {
+      text-align: center;
+    }
+
+    #risk-gauge { display: block; margin: 0 auto; }
+
+    .risk-score-display {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 52px;
+      color: #fff;
+      line-height: 1;
+      margin-top: 8px;
+    }
+
+    .risk-score-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.25);
+      text-transform: uppercase;
+    }
+
+    /* ── Recommendations ───────────────────────────────── */
+    .recommendation-item {
+      display: grid;
+      grid-template-columns: 40px 1fr auto;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(74,158,255,0.06);
+      align-items: start;
+    }
+
+    .recommendation-item:last-child { border-bottom: none; }
+
+    .rec-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 28px;
+      color: rgba(74,158,255,0.4);
+      line-height: 1;
+    }
+
+    .rec-text {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.7;
+      min-height: 20px;
+    }
+
+    /* ── Methodology ───────────────────────────────────── */
+    .methodology-text {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      font-size: 12px;
+      color: rgba(255,255,255,0.35);
+      line-height: 1.9;
+    }
+
+    /* ── Report footer ─────────────────────────────────── */
+    .report-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      margin-top: 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .report-footer-text {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.2);
+      text-transform: uppercase;
+    }
+
+    /* ── Mini charts ───────────────────────────────────── */
+    .mini-charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-top: 16px;
+    }
+
+    .mini-chart-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 16px;
+    }
+
+    canvas.mini-chart { display: block; width: 100%; }
+
+    /* ── Loading shimmer ───────────────────────────────── */
+    .stream-shimmer {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .shimmer-line {
+      height: 10px;
+      border-radius: 0;
+    }
+
+    /* ── @media print ──────────────────────────────────── */
+    @media print {
+      body {
+        background: #fff;
+        color: #1a1a2e;
+      }
+      .tl-nav { display: none !important; }
+      .report-cover-logo { color: #1a1a2e; }
+      .report-cover-title { color: #1a1a2e; }
+      .section-eyebrow { color: #4a9eff; }
+      .ai-stream-area,
+      .report-incident-text,
+      .rec-text,
+      .methodology-text { color: #333; }
+      .tl-card,
+      .report-stat-card,
+      .report-meta-cell {
+        background: #f5f7fa;
+        border-color: #dde4ee;
+      }
+      .report-stat-value,
+      .stat-value { color: #1a1a2e; }
+      .stat-label,
+      .report-meta-cell-label,
+      .report-meta-cell-value { color: #555; }
+      .section-eyebrow { page-break-before: always; }
+      .risk-section { grid-template-columns: 160px 1fr; }
+      .cursor { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      .report-meta-grid  { grid-template-columns: 1fr 1fr; }
+      .report-stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .mini-charts-row   { grid-template-columns: 1fr; }
+      .risk-section      { grid-template-columns: 1fr; }
+      .recommendation-item { grid-template-columns: 30px 1fr auto; gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Sticky nav ─────────────────────────────────────────── -->
+<nav class="tl-nav">
+  <a href="index.html" class="tl-nav-logo">ARGUS</a>
+  <div class="tl-nav-center">
+    <div class="tl-nav-status-dot"></div>
+    <span id="nav-session">AI Generated Report · Session –</span>
+  </div>
+  <div class="tl-nav-right">
+    <button class="btn-accent" id="btn-print" type="button">Print / Export PDF</button>
+    <a href="dashboard.html" class="btn-ghost">← Dashboard</a>
+  </div>
+</nav>
+
+<div class="report-body">
+
+  <!-- ── Cover ──────────────────────────────────────────── -->
+  <div class="report-cover">
+    <div class="report-cover-top">
+      <span class="report-cover-logo">ARGUS AI</span>
+      <span class="report-cover-date" id="report-date">–</span>
+    </div>
+
+    <div class="report-cover-title">Traffic Safety<br>Analysis Report</div>
+
+    <div class="report-meta-grid">
+      <div class="report-meta-cell">
+        <span class="report-meta-cell-label">Video File</span>
+        <span class="report-meta-cell-value" id="meta-filename">–</span>
+      </div>
+      <div class="report-meta-cell">
+        <span class="report-meta-cell-label">Processing Time</span>
+        <span class="report-meta-cell-value" id="meta-processing">–</span>
+      </div>
+      <div class="report-meta-cell">
+        <span class="report-meta-cell-label">Detection Confidence</span>
+        <span class="report-meta-cell-value" id="meta-confidence">–</span>
+      </div>
+      <div class="report-meta-cell">
+        <span class="report-meta-cell-label">Duration</span>
+        <span class="report-meta-cell-value" id="meta-duration">–</span>
+      </div>
+      <div class="report-meta-cell">
+        <span class="report-meta-cell-label">Total Vehicles</span>
+        <span class="report-meta-cell-value" id="meta-vehicles">–</span>
+      </div>
+      <div class="report-meta-cell">
+        <span class="report-meta-cell-label">Incidents Detected</span>
+        <span class="report-meta-cell-value" id="meta-incidents">–</span>
+      </div>
+    </div>
+
+    <span class="report-persona-badge" id="persona-badge">–</span>
+  </div>
+
+  <!-- ── 01 Executive Summary ───────────────────────────── -->
+  <span class="section-eyebrow">01 — Executive Summary</span>
+  <div class="ai-stream-area loading" id="exec-summary">
+    <div class="stream-shimmer">
+      <div class="shimmer-line shimmer" style="width:88%"></div>
+      <div class="shimmer-line shimmer" style="width:72%"></div>
+      <div class="shimmer-line shimmer" style="width:80%"></div>
+    </div>
+  </div>
+
+  <!-- ── 02 Key Statistics ──────────────────────────────── -->
+  <span class="section-eyebrow">02 — Key Statistics</span>
+  <div class="report-stats-grid" id="stats-grid">
+    <div class="report-stat-card"><span class="report-stat-label">Total Vehicles</span><span class="report-stat-value" id="rs-vehicles">–</span></div>
+    <div class="report-stat-card"><span class="report-stat-label">Avg Speed</span><span class="report-stat-value" id="rs-speed">–</span></div>
+    <div class="report-stat-card"><span class="report-stat-label">Congestion Index</span><span class="report-stat-value" id="rs-congestion">–</span></div>
+    <div class="report-stat-card"><span class="report-stat-label">Anomalies Flagged</span><span class="report-stat-value" id="rs-incidents">–</span></div>
+  </div>
+
+  <div class="mini-charts-row">
+    <div class="mini-chart-wrap">
+      <span class="mono-label" style="font-size:7px;margin-bottom:8px;">Vehicle Flow</span>
+      <canvas id="mini-flow" class="mini-chart"></canvas>
+    </div>
+    <div class="mini-chart-wrap">
+      <span class="mono-label" style="font-size:7px;margin-bottom:8px;">Vehicle Composition</span>
+      <canvas id="mini-donut" class="mini-chart"></canvas>
+    </div>
+  </div>
+
+  <!-- ── 03 Incident Analysis ───────────────────────────── -->
+  <span class="section-eyebrow">03 — Incident Analysis</span>
+  <div id="incidents-section">
+    <!-- Populated by report.js -->
+  </div>
+
+  <!-- ── 04 Risk Assessment ─────────────────────────────── -->
+  <span class="section-eyebrow">04 — Risk Assessment</span>
+  <div class="risk-section">
+    <div class="risk-gauge-wrap">
+      <canvas id="risk-gauge" width="200" height="110"></canvas>
+      <div class="risk-score-display" id="risk-score">–</div>
+      <div class="risk-score-label">Overall Risk Score</div>
+      <div style="margin-top:10px;" id="risk-badge"></div>
+    </div>
+    <div>
+      <div class="ai-stream-area loading" id="risk-narrative">
+        <div class="stream-shimmer">
+          <div class="shimmer-line shimmer" style="width:90%"></div>
+          <div class="shimmer-line shimmer" style="width:68%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 05 Recommendations ─────────────────────────────── -->
+  <span class="section-eyebrow">05 — Recommendations</span>
+  <div id="recommendations-section">
+    <!-- Populated by report.js -->
+  </div>
+
+  <!-- ── 06 Methodology ─────────────────────────────────── -->
+  <span class="section-eyebrow">06 — Methodology</span>
+  <p class="methodology-text">
+    Detection performed using YOLOv8s, a single-stage object detector trained on COCO and fine-tuned on traffic footage. Vehicle tracking uses DeepSORT — a real-time multi-object tracker combining Kalman-filter motion prediction with deep-appearance embeddings, providing persistent vehicle IDs across occlusion and re-entry events.
+    <br><br>
+    Incident classification uses Time-To-Collision (TTC) derived from frame-to-frame pixel gap closure rates, Post-Encroachment Time (PET) via spatial zone grids, and relative deceleration thresholds. Confidence scores reflect the simultaneous activation of multiple danger signals; a minimum of 4 consecutive danger frames is required before an incident is emitted. Causal factor inference applies eight rule-based filters derived from traffic safety literature and validated on five test clips.
+    <br><br>
+    All metrics are computed at inference time on CPU/MPS. Pixel-to-metre calibration uses a rough estimate of 22 pixels/metre; results should be treated as indicative rather than absolute until camera homography is calibrated for the specific installation.
+  </p>
+
+  <!-- ── Report footer ─────────────────────────────────── -->
+  <div class="report-footer">
+    <span class="report-footer-text" id="report-footer-text">Generated by ARGUS AI · – · Session –</span>
+    <span class="report-footer-text">Confidential — For Authorised Use Only</span>
+  </div>
+
+</div><!-- /.report-body -->
+
+<script type="module" src="js/report.js"></script>
+</body>
+</html>

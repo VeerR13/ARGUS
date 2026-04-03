@@ -1,0 +1,34 @@
+{
+  "total_images": 663,
+  "total_labels": 663,
+  "images_without_label": 0,
+  "labels_without_image": 0,
+  "md5_exact_duplicates": 0,
+  "duplicate_groups": 0,
+  "size_bytes": {
+    "mean": 48945.0,
+    "min": 1947,
+    "max": 1187531
+  },
+  "class_counts": {
+    "background (hard_negative)": {
+      "sample_count": 663,
+      "flagged_low": false,
+      "note": "Empty label files = YOLO background class"
+    },
+    "vehicle (positive, estimated)": {
+      "sample_count": 7077,
+      "flagged_low": false,
+      "note": "Estimated from trajectory frame counts across 3 non-accident videos"
+    }
+  },
+  "hard_neg_to_positive_ratio": 0.0937,
+  "ratio_status": "TOO LOW (9.4%) \u2014 mine more negatives; target 10\u201320%",
+  "additional_negatives_needed": 44,
+  "week3_recommendations": [
+    "Add camera homography calibration (Week 3) to replace pixels_per_meter=22 rough estimate.",
+    "Run fine-tuning: yolo train data=data.yaml model=yolov8s.pt epochs=50 imgsz=640",
+    "Evaluate fine-tuned model with week2_eval_complete.py to compare pre/post metrics.",
+    "Consider using YOLOv8m or YOLOv9 backbone for improved small-vehicle detection."
+  ]
+}
