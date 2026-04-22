@@ -1,0 +1,35 @@
+{
+  "overall_precision": 0.344115004492363,
+  "total_tp": 383,
+  "total_fp": 730,
+  "per_class": {
+    "car": {
+      "class_id": 0,
+      "tp": 361,
+      "fp": 649,
+      "pred_count": 1010,
+      "precision": 0.3574257425742574,
+      "flagged": true
+    },
+    "bus": {
+      "class_id": 2,
+      "tp": 21,
+      "fp": 81,
+      "pred_count": 102,
+      "precision": 0.20588235294117646,
+      "flagged": true
+    },
+    "truck": {
+      "class_id": 3,
+      "tp": 1,
+      "fp": 0,
+      "pred_count": 1,
+      "precision": 1.0,
+      "flagged": false
+    }
+  },
+  "flagged_classes": [
+    "car",
+    "bus"
+  ]
+}

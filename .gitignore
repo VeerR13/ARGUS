@@ -24,6 +24,15 @@ ml/reports/hard_negatives/
 ml/unseen_test_videos/
 ml/sample_videos/
 ml/models/
+ml/yt_videos/
+ml/overhead_data/
+ml/talha_annotation_batch/
+ml/talha_annotation_batch_v2.zip
+ml/talha_annotation_batch_v3/
+ml/annotation_batch_v3/
+ml/annotation_batch_v3.zip
+ml/annotations/ANNOTATED*
+ml/annotations_remapped/*/images
 
 # Demo videos in UI
 ui/assets/*.mp4

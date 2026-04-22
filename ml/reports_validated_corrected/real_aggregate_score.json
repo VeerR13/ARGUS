@@ -1,0 +1,18 @@
+{
+  "aggregate_score": 48.65,
+  "grade": "D",
+  "components": {
+    "mean_iou": 70.26,
+    "phantom_fp_rate": 34.41,
+    "recall": 29.95,
+    "precision": 34.41,
+    "bbox_lag": 75.54
+  },
+  "weights": {
+    "mean_iou": 0.25,
+    "phantom_fp_rate": 0.25,
+    "recall": 0.2,
+    "precision": 0.15,
+    "bbox_lag": 0.15
+  }
+}
