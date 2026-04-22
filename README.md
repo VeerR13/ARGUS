@@ -1,8 +1,8 @@
 # ARGUS — Autonomous Road Guard Unified Surveillance
 
-> **Active development** — pipeline, UI, and dataset are all evolving. See [Development Timeline](#development-timeline) for current status and next steps.
+> Active development — pipeline, model, and UI are all evolving. Current training results are a baseline we are actively working to improve.
 
-Real-time traffic anomaly detection system. Detects vehicles, tracks trajectories, and flags accidents, near-misses, and dangerous interactions from dashcam and overhead CCTV footage.
+Real-time traffic anomaly detection system. Detects vehicles, tracks trajectories, and flags accidents, near-misses, and dangerous interactions from dashcam footage.
 
 Live demo → **[argus-platform.vercel.app](https://argus-platform.vercel.app)**
 
@@ -11,22 +11,8 @@ Live demo → **[argus-platform.vercel.app](https://argus-platform.vercel.app)**
 | Role | Responsibilities |
 |------|-----------------|
 | ML Generalist | Pipeline architecture, detection/tracking, anomaly scoring, evaluation |
-| ML Engineer | Dataset construction, model fine-tuning, hard-negative mining, annotation pipeline |
-| Frontend Engineer | Dashboard UI, Three.js landing, charts, persona system, AI chat integration |
-
----
-
-## What It Does
-
-Upload a dashcam or CCTV clip → ARGUS detects every vehicle frame-by-frame, builds per-track trajectories, and applies a physics-based interaction scorer to flag:
-
-- **Accidents** — bounding-box overlap + PET ≈ 0 s + TTC < 0.5 s
-- **Near-misses** — TTC < 1.0 s with confirmed closing speed ≥ 15 km/h
-- **Dangerous braking** — sudden deceleration ≥ 6 m/s² over 10 frames
-- **Speed violations** — per-vehicle speed relative to ambient traffic
-- **Dense-traffic anomalies** — stricter thresholds kick in automatically when ≥ 6 vehicles fill the frame
-
-The UI presents the analysis as a multi-persona report (insurance, city operations, emergency services) with an incident timeline, heatmap, confidence metrics, and an embedded AI chat.
+| ML Engineer | Dataset construction, model training, hard-negative mining |
+| Frontend Engineer | Dashboard UI, Three.js landing, charts, persona system, AI chat |
 
 ---
 
@@ -34,47 +20,85 @@ The UI presents the analysis as a multi-persona report (insurance, city operatio
 
 ```
 ARGUS/
-├── ml/                         # Computer vision + anomaly detection pipeline
-│   ├── ml_pipeline/
+├── ml/
+│   ├── ml_pipeline/            # Core detection + tracking + anomaly scoring
 │   │   ├── detection.py        # YOLOv8 detector + TemporalConfirmationBuffer
 │   │   ├── tracking.py         # DeepSORT wrapper (Kalman-filtered bboxes)
 │   │   ├── trajectory.py       # Per-track trajectory + speed estimation
-│   │   └── interaction.py      # 9-filter anomaly scorer (TTC, PET, decel, F7-F9)
+│   │   └── interaction.py      # 9-filter anomaly scorer (TTC, PET, decel)
+│   ├── training/
+│   │   ├── argus-1.ipynb       # Kaggle notebook — BDD100K fine-tune run
+│   │   └── results.csv         # Per-epoch training metrics from that run
 │   ├── week1_test.py           # Week 1: baseline detection + tracking eval
-│   ├── week2_eval.py           # Week 2: evaluation metrics
 │   ├── week2_eval_complete.py  # Week 2: full pipeline eval with all metrics
 │   ├── week3_retrain.py        # Week 3: dataset build + YOLOv8n fine-tuning
-│   ├── week3_annotate.py       # Week 3: CVAT annotation frame extractor (500 frames)
 │   ├── boost_classes.py        # Minority class balancing (motorcycle/bus/truck)
-│   ├── build_overhead_dataset.py  # Overhead/CCTV dataset from YouTube + COCO + VisDrone
-│   ├── download_coco_vehicles.py  # COCO vehicle subset downloader
-│   ├── extract_annotation_batch.py # Export frames to CVAT for human annotation
-│   ├── hard_negative_mining.py # Background false-positive mining from TemporalBuffer
+│   ├── hard_negative_mining.py # Background FP mining from TemporalBuffer
 │   ├── train_augmentation.py   # Augmentation pipeline for retraining
-│   ├── eval_real.py            # Real-footage evaluation against human annotations
-│   ├── score_projection.py     # Score projection utilities
-│   ├── debug_incident.py       # Incident visualisation debug tool
-│   ├── dataset/
-│   │   └── data.yaml           # YOLO dataset config
-│   ├── annotation_tasks/       # CVAT metadata + frame index (frames excluded)
-│   ├── annotations_remapped/   # Remapped YOLO-format annotation labels
-│   └── reports_validated*/     # Eval reports against human-annotated ground truth
-└── ui/                         # Analytics dashboard
+│   ├── eval_real.py            # Evaluation against human-annotated ground truth
+│   └── dataset/data.yaml       # YOLO dataset config
+└── ui/
     ├── index.html              # Landing page (Three.js Earth globe)
-    ├── dashboard.html          # Main analysis dashboard
+    ├── dashboard.html          # Analysis dashboard
     ├── incident.html           # Per-incident detail view
     ├── report.html             # Printable report
-    ├── css/main.css            # Global design system (dark, monospace aesthetic)
-    ├── js/
-    │   ├── landing.js          # Three.js scene + upload flow
-    │   ├── dashboard.js        # Charts, stats, persona switcher, AI panel
-    │   ├── incident.js         # Incident detail renderer
-    │   ├── report.js           # Report builder
-    │   ├── api.js              # Data fetching (mock + real stubs)
-    │   └── utils.js            # Shared helpers
-    └── assets/
-        └── mock_analysis.json  # Demo analysis payload
+    ├── css/main.css
+    └── js/
+        ├── landing.js          # Three.js scene + upload flow
+        ├── dashboard.js        # Charts, stats, persona switcher, AI panel
+        ├── api.js              # Data fetching (mock + real API stubs)
+        └── utils.js
 ```
+
+---
+
+## Current Training Results
+
+> These are our current numbers. We are actively working to improve them — see [What We Are Working On](#what-we-are-working-on) below.
+
+**Model:** YOLOv8l fine-tuned on BDD100K (20,000 dashcam images, 4 vehicle classes)
+**Training run:** `ml/training/argus-1.ipynb` · Full per-epoch log: `ml/training/results.csv`
+
+### Overall (BDD100K validation set, 2,000 images)
+
+| Metric | Value |
+|--------|-------|
+| mAP50 | **62.3%** |
+| mAP50-95 | 40.9% |
+| Precision | 69.0% |
+| Recall | 55.6% |
+
+### Per-Class Breakdown
+
+| Class | mAP50 | Precision | Recall | Training samples |
+|-------|-------|-----------|--------|-----------------|
+| Car | **80.4%** | 80.5% | 73.9% | 205,514 labels |
+| Truck | 64.9% | 67.2% | 59.6% | 3,350 labels |
+| Bus | 61.1% | 66.4% | 54.5% | 8,630 labels |
+| Motorcycle | 42.8% | 61.8% | 34.3% | 840 labels |
+
+The class imbalance is the main problem. Motorcycle is 0.4% of all training labels — the model barely learned it. Car dominates at 94% of labels, which is why it performs well.
+
+### Week 2 Pipeline Eval (synthetic, pre-annotation)
+
+| Metric | Score |
+|--------|-------|
+| Phantom detection rate | 100% |
+| IoU consistency | 93.7% |
+| Bbox lag | 91.1% |
+| Dedup accuracy | 100% |
+| **Aggregate** | **96.1 / 100** |
+
+---
+
+## What We Are Working On
+
+| Priority | Task |
+|----------|------|
+| 1 | Fix class imbalance — motorcycle/bus/truck are severely underrepresented in BDD100K. `boost_classes.py` adds pseudo-labeled minority class frames to the training set. |
+| 2 | Run more epochs — training was cut at 30, still improving. Target is 80%+ mAP50 overall. |
+| 3 | Backend API — wire up `/api/upload` and `/api/jobs/{id}/status` to replace the UI mock. |
+| 4 | Speed calibration — replace pixel-based speed estimate with homography. |
 
 ---
 
@@ -84,70 +108,28 @@ ARGUS/
 Python · YOLOv8 (Ultralytics) · DeepSORT · OpenCV · NumPy
 
 ### Detection — `ml_pipeline/detection.py`
-- **Model:** YOLOv8s (COCO pretrained) or fine-tuned `week2_retrained.pt`
+- **Model:** YOLOv8l (BDD100K fine-tuned) or fallback to COCO `yolov8s.pt`
 - **Classes:** car, motorcycle, bus, truck
-- **Confidence:** 0.50 · **NMS IoU:** 0.35
-- **TemporalConfirmationBuffer:** a detection must appear in 3 consecutive frames (IoU ≥ 0.40) before reaching the tracker — eliminates shadow/reflection phantom fires
+- **TemporalConfirmationBuffer:** detection must appear in 3 consecutive frames (IoU ≥ 0.40) before reaching the tracker — eliminates shadow/reflection phantom fires
 
 ### Tracking — `ml_pipeline/tracking.py`
 - DeepSORT with MobileNet embedder
-- `n_init=2` (track confirmed after 2 frames) · `max_age=30` frames
-- Returns **post-Kalman** `to_ltrb()` positions — reduces bbox lag on fast vehicles
-
-### Trajectory — `ml_pipeline/trajectory.py`
-- Per-track center history + pixel-displacement speed estimate (km/h)
-- Speed capped at 200 km/h; zeroed on non-consecutive frames
+- `n_init=2` · `max_age=30` frames
+- Returns post-Kalman `to_ltrb()` positions — reduces bbox lag on fast vehicles
 
 ### Anomaly Scoring — `ml_pipeline/interaction.py`
-Physics-based pairwise interaction scorer with 9 filters:
+Physics-based pairwise scorer with 9 filters:
 
-| Filter | Description |
-|--------|-------------|
-| F1 | TTC < threshold (1.0 s near-miss / 0.5 s accident) |
-| F2 | Same-depth check — suppress laterally-separated vehicles |
+| Filter | What it checks |
+|--------|---------------|
+| F1 | TTC < 1.0 s (near-miss) or < 0.5 s (accident) |
+| F2 | Same-depth gate — suppresses laterally-separated vehicles |
 | F3 | Relative deceleration ≥ 6 m/s² over 10 frames |
-| F4 | Minimum consecutive danger frames = 4 (fast accidents fire in 1-3 frames) |
+| F4 | Minimum 4 consecutive danger frames |
 | F5 | PET = 0 + bbox overlap → accident |
 | F7 | Speed floor — at least one vehicle must exceed 15 km/h |
 | F8 | Gap monotonicity — gap must be steadily closing (≥ 65% of transitions) |
-| F9 | Dense-traffic mode — when ≥ 6 vehicles in frame, stricter TTC/speed gates; distance gate disabled |
-
----
-
-## Model Performance
-
-### Week 2 Pipeline Evaluation (synthetic metrics)
-| Metric | Score | Weight |
-|--------|-------|--------|
-| Phantom detection rate | 100 % | 0.25 |
-| IoU consistency | 93.7 % | 0.25 |
-| Bbox lag | 91.1 % | 0.20 |
-| Dedup accuracy | 100 % | 0.15 |
-| Inter-frame consistency | 96.0 % | 0.15 |
-| **Aggregate** | **96.1 / 100 — Grade A** | |
-
-### Week 3 Real-World Evaluation (human-annotated ground truth)
-| Metric | Value |
-|--------|-------|
-| Mean IoU | 70.3 % |
-| Recall | 30.0 % |
-| Precision | 34.4 % |
-| Phantom FP rate | 34.4 % |
-| Bbox lag | 75.5 % |
-| **Aggregate** | **48.6 / 100 — Grade D** |
-
-> **Gap analysis:** The pipeline was built and evaluated on dashcam footage; the human-annotated dataset came from overhead CCTV at a different perspective, scale, and angle. This caused most of the recall/precision drop. `build_overhead_dataset.py` and `boost_classes.py` directly address this by sourcing overhead training data from YouTube traffic cams, COCO, and VisDrone.
-
-### YOLOv8n Fine-tune (Week 3)
-| Metric | Value |
-|--------|-------|
-| Base model | yolov8n.pt |
-| Training samples | 438 positives + 663 hard negatives |
-| Best epoch | 27 / 30 |
-| mAP@50 | 78.2 % |
-| mAP@50-95 | 57.1 % |
-| Precision | 81.1 % |
-| Recall | 74.4 % |
+| F9 | Dense-traffic mode — when ≥ 6 vehicles in frame, stricter thresholds |
 
 ---
 
@@ -157,37 +139,10 @@ Physics-based pairwise interaction scorer with 9 filters:
 HTML · CSS · Vanilla JS (ES modules) · Three.js · Vercel
 
 ### Pages
-
-**`index.html` — Landing**
-- Three.js Earth globe with city-to-city animated arcs (21 global pairs)
-- Radar sweep animation
-- Video upload modal → progress ramp → redirect to dashboard
-
-**`dashboard.html` — Analysis Dashboard**
-- File info bar, detection confidence chips, summary stats
-- Persona switcher: **Insurance** / **City Operations** / **Emergency Services** — each re-renders the AI analysis section with role-specific language
-- Anomaly timeline log with severity badges and causal-factor accordion
-- Confidence bar charts, speed distribution, congestion heatmap
-- Embedded Claude AI chat for natural-language queries on the report
-- Export to CSV / PDF
-
-**`incident.html` — Incident Detail**
-Per-incident view with vehicle trajectory playback, causal factor breakdown, and confidence scoring.
-
-**`report.html` — Report View**
-Printable full analysis report.
-
----
-
-## Development Timeline
-
-| Phase | Status | Work |
-|-------|--------|------|
-| Week 1 | Done | YOLOv8 detector · DeepSORT integration · trajectory builder · `week1_test.py` |
-| Week 2 | Done | Hard negative mining · pseudo-GT labelling · confidence/track-length histograms · **96.1/100** pipeline eval |
-| Week 3 | Done | YOLOv8n fine-tune (mAP50=78 %) · CVAT annotation pipeline (500 frames) · real-world eval vs human annotations (**48.6/100** — perspective gap identified) |
-| Week 4 | Active | Overhead dataset builder from YouTube + COCO + VisDrone · minority class boosting (motorcycle/bus/truck) · retrain on overhead data to close the perspective gap |
-| Upcoming | Planned | Backend API (`/api/upload`, `/api/jobs/{id}/status`) to replace UI mocks · homography-based speed calibration · live RTSP stream support |
+- **`index.html`** — Three.js Earth globe with city-to-city animated arcs, upload modal, progress flow
+- **`dashboard.html`** — Anomaly timeline, confidence charts, speed distribution, congestion heatmap, persona switcher (Insurance / City Operations / Emergency Services), Claude AI chat
+- **`incident.html`** — Per-incident detail with vehicle trajectory and causal factor breakdown
+- **`report.html`** — Printable full report
 
 ---
 
@@ -198,74 +153,40 @@ Printable full analysis report.
 ```bash
 cd ml
 pip install ultralytics deep-sort-realtime opencv-python numpy
-
-# Run on a video
 python eval_real.py --source path/to/video.mp4
-
-# Or step through the weekly scripts
-python week1_test.py
-python week2_eval_complete.py
-python week3_retrain.py --epochs 30 --device cpu
 ```
 
-### Overhead Dataset (Week 4 prep)
+### Training (Kaggle)
 
-```bash
-cd ml
-# Download COCO vehicle subset
-python download_coco_vehicles.py
-
-# Download YouTube overhead traffic clips (requires yt-dlp)
-pip install yt-dlp
-bash download_yt_traffic.sh
-
-# Build overhead training set + retrain
-python build_overhead_dataset.py --epochs 50 --device cpu
-```
-
-### Class Balancing
-
-```bash
-cd ml
-python boost_classes.py --epochs 30 --device cpu
-```
-
-### CVAT Annotation Export
-
-```bash
-cd ml
-python extract_annotation_batch.py   # outputs annotation_batch_v3/ (500 frames)
-```
+See `ml/training/argus-1.ipynb`. Requires:
+1. Kaggle account with GPU P100 enabled
+2. BDD100K YOLO dataset added as input (`a7madmostafa/bdd100k-yolo`)
 
 ### UI (local)
 
 ```bash
 cd ui
-# Open index.html in a browser — no build step required
-# ES modules require a local server:
 python -m http.server 8080
-# then open http://localhost:8080
+# open http://localhost:8080
 ```
+
+---
+
+## Development Timeline
+
+| Phase | Status | Summary |
+|-------|--------|---------|
+| Week 1 | Done | Detection + DeepSORT tracking + trajectory builder |
+| Week 2 | Done | Hard negative mining · pseudo-GT · 96.1/100 pipeline eval |
+| Week 3 | Done | YOLOv8n fine-tune attempt · CVAT annotation pipeline |
+| BDD100K training | Done | YOLOv8l on 20K dashcam images · 62.3% mAP50 · results in `ml/training/` |
+| Week 4 | Active | Class balancing · more training epochs · target 80%+ mAP50 |
+| Upcoming | Planned | Backend API · homography speed calibration · live stream support |
 
 ---
 
 ## Dataset
 
-- Detection model pretrained on COCO, fine-tuned on dashcam footage
-- 438 confirmed-vehicle positives + 663 hard negatives (background patches from TemporalBuffer rejects)
-- Human-annotated ground truth: overhead CCTV frames labelled in CVAT
-- Large image sets not included in repo (see `ml/dataset/data.yaml` for directory structure)
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Detection | YOLOv8s / YOLOv8n (Ultralytics) |
-| Tracking | DeepSORT (deep-sort-realtime) |
-| Anomaly scoring | Custom Python — TTC, PET, deceleration, gap monotonicity |
-| Training | Ultralytics YOLO fine-tune · augmentation pipeline |
-| Annotation | CVAT (Cloud) |
-| Frontend | HTML5 · CSS3 · Vanilla JS (ES modules) · Three.js |
-| Deployment (UI) | Vercel |
+- BDD100K: 20,000 dashcam images (train), 2,000 (val) — 4 vehicle classes remapped from BDD's 10 classes
+- Hard negatives: 663 background patches mined from TemporalConfirmationBuffer rejects
+- Large image sets not included in repo — see `ml/dataset/data.yaml` for directory structure
