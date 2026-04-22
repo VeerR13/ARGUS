@@ -1,65 +1,90 @@
 # ARGUS — Autonomous Road Guard Unified Surveillance
 
-> Active development — pipeline, model, and UI are all evolving. Current training results are a baseline we are actively working to improve.
-
-Real-time traffic anomaly detection system. Detects vehicles, tracks trajectories, and flags accidents, near-misses, and dangerous interactions from dashcam footage.
-
-Live demo → **[argus-platform.vercel.app](https://argus-platform.vercel.app)**
-
-### Team
-
-| Role | Responsibilities |
-|------|-----------------|
-| ML Generalist | Pipeline architecture, detection/tracking, anomaly scoring, evaluation |
-| ML Engineer | Dataset construction, model training, hard-negative mining |
-| Frontend Engineer | Dashboard UI, Three.js landing, charts, persona system, AI chat |
+> **Status:** Active research project. The live demo at [argus-platform.vercel.app](https://argus-platform.vercel.app) is a frontend prototype — no model is connected. All analysis shown is mock data. We are building toward a real backend.
 
 ---
 
-## Repository Structure
+## What Is ARGUS?
 
-```
-ARGUS/
-├── ml/
-│   ├── ml_pipeline/            # Core detection + tracking + anomaly scoring
-│   │   ├── detection.py        # YOLOv8 detector + TemporalConfirmationBuffer
-│   │   ├── tracking.py         # DeepSORT wrapper (Kalman-filtered bboxes)
-│   │   ├── trajectory.py       # Per-track trajectory + speed estimation
-│   │   └── interaction.py      # 9-filter anomaly scorer (TTC, PET, decel)
-│   ├── training/
-│   │   ├── argus-1.ipynb       # Kaggle notebook — BDD100K fine-tune run
-│   │   └── results.csv         # Per-epoch training metrics from that run
-│   ├── week1_test.py           # Week 1: baseline detection + tracking eval
-│   ├── week2_eval_complete.py  # Week 2: full pipeline eval with all metrics
-│   ├── week3_retrain.py        # Week 3: dataset build + YOLOv8n fine-tuning
-│   ├── boost_classes.py        # Minority class balancing (motorcycle/bus/truck)
-│   ├── hard_negative_mining.py # Background FP mining from TemporalBuffer
-│   ├── train_augmentation.py   # Augmentation pipeline for retraining
-│   ├── eval_real.py            # Evaluation against human-annotated ground truth
-│   └── dataset/data.yaml       # YOLO dataset config
-└── ui/
-    ├── index.html              # Landing page (Three.js Earth globe)
-    ├── dashboard.html          # Analysis dashboard
-    ├── incident.html           # Per-incident detail view
-    ├── report.html             # Printable report
-    ├── css/main.css
-    └── js/
-        ├── landing.js          # Three.js scene + upload flow
-        ├── dashboard.js        # Charts, stats, persona switcher, AI panel
-        ├── api.js              # Data fetching (mock + real API stubs)
-        └── utils.js
-```
+ARGUS is an end-to-end traffic anomaly detection system designed to process dashcam or CCTV footage and automatically identify dangerous events — accidents, near-misses, sudden braking, and unsafe lane changes — without any human review.
+
+The core research question: **can a purely computer-vision-based system, with no GPS or road-map data, reliably detect traffic incidents in real time using only raw video?**
+
+The answer involves solving three subproblems simultaneously:
+1. Detecting and classifying every vehicle in every frame under real-world conditions (occlusion, lighting changes, shadows, motion blur)
+2. Maintaining consistent vehicle identity across frames despite those same conditions
+3. Inferring *intent and danger* from raw pixel trajectories — no labeled incident data, no LiDAR, no depth sensor
 
 ---
 
-## Current Training Results
+## System Architecture
 
-> These are our current numbers. We are actively working to improve them — see [What We Are Working On](#what-we-are-working-on) below.
+```
+Video Input
+    │
+    ▼
+VehicleDetector          detection.py
+  YOLOv8l (BDD100K)      ─ confidence 0.50, NMS IoU 0.35
+  TemporalConfirmation   ─ 3-frame streak required before passing to tracker
+    │
+    ▼
+VehicleTracker           tracking.py
+  DeepSORT + MobileNet   ─ Kalman-filtered bbox positions
+  n_init=2, max_age=30
+    │
+    ▼
+TrajectoryBuilder        trajectory.py
+  Per-track history      ─ center positions, pixel-displacement speed (km/h)
+    │
+    ▼
+InteractionScorer        interaction.py
+  9-filter anomaly logic ─ TTC, PET, deceleration, gap monotonicity, dense-traffic mode
+    │
+    ▼
+Incident Report          { trajectories, incidents }
+```
 
-**Model:** YOLOv8l fine-tuned on BDD100K (20,000 dashcam images, 4 vehicle classes)
-**Training run:** `ml/training/argus-1.ipynb` · Full per-epoch log: `ml/training/results.csv`
+The pipeline is exposed as a single function `analyze_video()` in `ml_pipeline/__init__.py`, which returns trajectories and detected incidents ready for the UI or API.
 
-### Overall (BDD100K validation set, 2,000 images)
+---
+
+## ML Pipeline — Technical Detail
+
+### Detection (`ml_pipeline/detection.py`)
+
+Uses YOLOv8l fine-tuned on BDD100K. A **TemporalConfirmationBuffer** sits between the detector and tracker: a detection must appear in 3 consecutive frames (IoU ≥ 0.40) before being forwarded. This kills phantom detections from shadows and reflections — single-frame fires that plagued the early baseline.
+
+### Tracking (`ml_pipeline/tracking.py`)
+
+DeepSORT with MobileNet embedder. Returns **post-Kalman** `to_ltrb()` positions rather than raw YOLO bboxes — the Kalman prediction leads the bbox on fast-moving vehicles instead of lagging behind.
+
+### Anomaly Scoring (`ml_pipeline/interaction.py`)
+
+Physics-based pairwise scorer. For every pair of confirmed tracks per frame, nine filters are evaluated:
+
+| Filter | Logic |
+|--------|-------|
+| F1 | TTC < 1.0 s → near-miss; TTC < 0.5 s → accident |
+| F2 | Same-depth check — suppresses laterally-separated vehicles |
+| F3 | Relative deceleration ≥ 6 m/s² over 10 frames |
+| F4 | Min 4 consecutive danger frames (accidents are fast — 8 was too strict) |
+| F5 | PET = 0 + bbox overlap → collision confirmed |
+| F7 | Speed floor — at least one vehicle must exceed 15 km/h |
+| F8 | Gap monotonicity — gap must be steadily closing (≥ 65% of transitions) |
+| F9 | Dense-traffic mode — when ≥ 6 vehicles in frame, stricter TTC/speed gates, distance gate disabled |
+
+TTC and deceleration are calibration-independent: TTC uses frame-to-frame gap closing rate (pixels/second cancel out), and deceleration uses relative percentage speed drop. This means the scorer works across different camera setups without manual calibration.
+
+---
+
+## Current Model — Where We Are
+
+We are here. These are real numbers from `ml/training/results.csv`.
+
+**Model:** YOLOv8l fine-tuned on BDD100K (20,000 dashcam images, 30 epochs, Kaggle P100)
+**Notebook:** `ml/training/argus-1.ipynb`
+
+### Overall Performance (BDD100K val, 2,000 images)
 
 | Metric | Value |
 |--------|-------|
@@ -70,16 +95,16 @@ ARGUS/
 
 ### Per-Class Breakdown
 
-| Class | mAP50 | Precision | Recall | Training samples |
-|-------|-------|-----------|--------|-----------------|
-| Car | **80.4%** | 80.5% | 73.9% | 205,514 labels |
-| Truck | 64.9% | 67.2% | 59.6% | 3,350 labels |
-| Bus | 61.1% | 66.4% | 54.5% | 8,630 labels |
-| Motorcycle | 42.8% | 61.8% | 34.3% | 840 labels |
+| Class | mAP50 | Training labels | Note |
+|-------|-------|----------------|------|
+| Car | **80.4%** | 205,514 | Strong — data-rich |
+| Truck | 64.9% | 3,350 | Acceptable |
+| Bus | 61.1% | 8,630 | Acceptable |
+| Motorcycle | 42.8% | 840 | Weak — severely underrepresented |
 
-The class imbalance is the main problem. Motorcycle is 0.4% of all training labels — the model barely learned it. Car dominates at 94% of labels, which is why it performs well.
+**The problem is clear:** motorcycle is 0.4% of all training labels. The model barely learned it. Car dominates at 94% of the training data. We want to improve the overall number to 80%+ mAP50 before connecting the model to the live system.
 
-### Week 2 Pipeline Eval (synthetic, pre-annotation)
+### Week 2 Pipeline Eval (synthetic — pre-real-world testing)
 
 | Metric | Score |
 |--------|-------|
@@ -91,102 +116,107 @@ The class imbalance is the main problem. Motorcycle is 0.4% of all training labe
 
 ---
 
-## What We Are Working On
+## What We Are Trying to Improve and Why
 
-| Priority | Task |
-|----------|------|
-| 1 | Fix class imbalance — motorcycle/bus/truck are severely underrepresented in BDD100K. `boost_classes.py` adds pseudo-labeled minority class frames to the training set. |
-| 2 | Run more epochs — training was cut at 30, still improving. Target is 80%+ mAP50 overall. |
-| 3 | Backend API — wire up `/api/upload` and `/api/jobs/{id}/status` to replace the UI mock. |
-| 4 | Speed calibration — replace pixel-based speed estimate with homography. |
+### 1. Class Imbalance (highest priority)
 
----
+Motorcycle recall at 34% is unacceptable for a safety system. A motorcycle that the model misses is a motorcycle involved in an undetected near-miss. `boost_classes.py` addresses this by pseudo-labeling minority class frames from existing videos and rebalancing the training set before the next fine-tune.
 
-## ML Pipeline
+### 2. More Training Epochs
 
-### Stack
-Python · YOLOv8 (Ultralytics) · DeepSORT · OpenCV · NumPy
+The BDD100K run was cut at 30 epochs — validation mAP50 was still climbing (62.0% at epoch 30, up from 61.7% at epoch 23). The model had not plateaued. A 60-epoch run on the same data would likely push past 65%.
 
-### Detection — `ml_pipeline/detection.py`
-- **Model:** YOLOv8l (BDD100K fine-tuned) or fallback to COCO `yolov8s.pt`
-- **Classes:** car, motorcycle, bus, truck
-- **TemporalConfirmationBuffer:** detection must appear in 3 consecutive frames (IoU ≥ 0.40) before reaching the tracker — eliminates shadow/reflection phantom fires
+### 3. Additional Dashcam Data
 
-### Tracking — `ml_pipeline/tracking.py`
-- DeepSORT with MobileNet embedder
-- `n_init=2` · `max_age=30` frames
-- Returns post-Kalman `to_ltrb()` positions — reduces bbox lag on fast vehicles
+BDD100K is good but US/highway-biased. Adding dashcam footage from different geographies and traffic patterns (dense urban, night, rain) would improve generalization. This is a future data collection effort.
 
-### Anomaly Scoring — `ml_pipeline/interaction.py`
-Physics-based pairwise scorer with 9 filters:
+### 4. Speed Calibration
 
-| Filter | What it checks |
-|--------|---------------|
-| F1 | TTC < 1.0 s (near-miss) or < 0.5 s (accident) |
-| F2 | Same-depth gate — suppresses laterally-separated vehicles |
-| F3 | Relative deceleration ≥ 6 m/s² over 10 frames |
-| F4 | Minimum 4 consecutive danger frames |
-| F5 | PET = 0 + bbox overlap → accident |
-| F7 | Speed floor — at least one vehicle must exceed 15 km/h |
-| F8 | Gap monotonicity — gap must be steadily closing (≥ 65% of transitions) |
-| F9 | Dense-traffic mode — when ≥ 6 vehicles in frame, stricter thresholds |
+Current speed estimates are pixel-displacement-based with a fixed `pixels_per_meter = 30.0` constant. This is wrong for any camera that isn't the exact one used during development. A homography-based calibration (mapping road markings to real-world distances) is planned for the next phase.
 
 ---
 
-## UI
+## Research Prospects
 
-### Stack
-HTML · CSS · Vanilla JS (ES modules) · Three.js · Vercel
+The anomaly scoring system has properties that make it interesting beyond the immediate application:
 
-### Pages
-- **`index.html`** — Three.js Earth globe with city-to-city animated arcs, upload modal, progress flow
-- **`dashboard.html`** — Anomaly timeline, confidence charts, speed distribution, congestion heatmap, persona switcher (Insurance / City Operations / Emergency Services), Claude AI chat
-- **`incident.html`** — Per-incident detail with vehicle trajectory and causal factor breakdown
-- **`report.html`** — Printable full report
+**Calibration independence.** The TTC and deceleration metrics are designed to be camera-agnostic. Any system that requires physical calibration per deployment is impractical at scale. The current approach works without it, and the tradeoffs are quantified.
+
+**Temporal confirmation as a prior.** The TemporalConfirmationBuffer is essentially a learned prior over detection reliability — it suppresses low-confidence, short-lived detections without requiring a trained classifier. The buffer's false-negative rate (legitimate detections suppressed) vs false-positive suppression rate is a tunable parameter with a measurable tradeoff curve.
+
+**Physics-based scoring without ground truth.** The anomaly scorer uses no labeled incident data. It derives danger from physics (TTC, PET, closing speed) applied to raw trajectories. This means it can be evaluated on new footage types without retraining — only the detection model needs domain adaptation.
+
+**Dense-traffic mode.** F9 (automatic mode switch when ≥ 6 vehicles in frame) is an early form of scene-context awareness. In congested traffic, proximity is normal; only serious closing speed and tight TTC should fire. This is a precursor to more sophisticated context modeling.
+
+---
+
+## The Demo (UI)
+
+**[argus-platform.vercel.app](https://argus-platform.vercel.app)** — a frontend prototype only.
+
+No model is running behind it. All analysis data shown on the dashboard is hardcoded mock data (`ui/js/api.js` → `MOCK_DATA`). The upload flow simulates a 5-second processing ramp then loads a fixed demo result.
+
+The real API endpoints are stubbed in `api.js` but commented out:
+- `POST /api/upload` — video upload
+- `GET /api/jobs/{id}/status` — polling for analysis progress
+- `POST /api/ai/analyze` — Claude streaming analysis
+- `POST /api/ai/ask` — AI chat on the report
+
+The UI will be wired to a real backend once the model hits acceptable accuracy. Building the frontend first let us validate the UX and data contract before committing to a backend architecture.
+
+**UI features (all functional with mock data):**
+- Three.js Earth globe landing with city-arc animations
+- Full analysis dashboard: incident timeline, confidence charts, speed distribution, heatmap
+- Persona switcher — Insurance / City Operations / Emergency Services (each reframes the AI analysis)
+- Per-incident detail view with causal factor breakdown
+- CSV and PDF export
+- Embedded Claude AI chat for natural-language queries on the report
+
+---
+
+## Development Timeline
+
+| Phase | Status | What was done |
+|-------|--------|--------------|
+| Week 1 | Done | YOLOv8 detector, DeepSORT tracking, trajectory builder, basic eval |
+| Week 2 | Done | Hard negative mining, pseudo-GT labelling, TemporalConfirmationBuffer, 96.1/100 pipeline eval |
+| Week 3 | Done | YOLOv8n fine-tune attempt, CVAT annotation pipeline |
+| BDD100K training | Done | YOLOv8l on 20K dashcam images — 62.3% mAP50. Results in `ml/training/` |
+| Now | **Active** | Fix class imbalance, push toward 80%+ mAP50 before connecting model to UI |
+| Next | Planned | Backend API, speed calibration, live stream support |
 
 ---
 
 ## Setup
 
-### ML Pipeline
+### Run the pipeline
 
 ```bash
 cd ml
 pip install ultralytics deep-sort-realtime opencv-python numpy
-python eval_real.py --source path/to/video.mp4
+python -c "from ml_pipeline import analyze_video; print(analyze_video('your_video.mp4'))"
 ```
 
 ### Training (Kaggle)
 
-See `ml/training/argus-1.ipynb`. Requires:
-1. Kaggle account with GPU P100 enabled
-2. BDD100K YOLO dataset added as input (`a7madmostafa/bdd100k-yolo`)
+Open `ml/training/argus-1.ipynb` on Kaggle with:
+- GPU: P100
+- Dataset: `a7madmostafa/bdd100k-yolo`
 
 ### UI (local)
 
 ```bash
 cd ui
 python -m http.server 8080
-# open http://localhost:8080
+# http://localhost:8080
 ```
 
 ---
 
-## Development Timeline
+## Team
 
-| Phase | Status | Summary |
-|-------|--------|---------|
-| Week 1 | Done | Detection + DeepSORT tracking + trajectory builder |
-| Week 2 | Done | Hard negative mining · pseudo-GT · 96.1/100 pipeline eval |
-| Week 3 | Done | YOLOv8n fine-tune attempt · CVAT annotation pipeline |
-| BDD100K training | Done | YOLOv8l on 20K dashcam images · 62.3% mAP50 · results in `ml/training/` |
-| Week 4 | Active | Class balancing · more training epochs · target 80%+ mAP50 |
-| Upcoming | Planned | Backend API · homography speed calibration · live stream support |
-
----
-
-## Dataset
-
-- BDD100K: 20,000 dashcam images (train), 2,000 (val) — 4 vehicle classes remapped from BDD's 10 classes
-- Hard negatives: 663 background patches mined from TemporalConfirmationBuffer rejects
-- Large image sets not included in repo — see `ml/dataset/data.yaml` for directory structure
+| Role | Responsibilities |
+|------|-----------------|
+| ML Generalist | Pipeline architecture, anomaly scoring, evaluation |
+| ML Engineer | Dataset construction, model training, class balancing |
+| Frontend Engineer | Dashboard, Three.js landing, persona system, AI chat |
