@@ -15,6 +15,8 @@ Class IDs: RF-DETR is COCO-80-class, same mapping as YOLOv8 (car=2, motorcycle=3
 bus=5, truck=7). No mapping changes required downstream.
 """
 
+import os
+
 import cv2
 import numpy as np
 from rfdetr import RFDETRBase, RFDETRLarge
@@ -135,9 +137,13 @@ class VehicleDetector:
         confidence: float = 0.40,            # lower than YOLOv8 — RF-DETR calibrated
         device: str       = "cpu",
         temporal_confirm: bool = True,
+        pretrain_weights: str | None = None,  # path to a finetuned .pth checkpoint
     ):
-        large = "large" in model_path.lower()
-        self.model      = RFDETRLarge() if large else RFDETRBase()
+        large  = "large" in model_path.lower()
+        kwargs = {}
+        if pretrain_weights and os.path.exists(pretrain_weights):
+            kwargs["pretrain_weights"] = pretrain_weights
+        self.model      = RFDETRLarge(**kwargs) if large else RFDETRBase(**kwargs)
         self.confidence = confidence
         self.device     = device
         self._buffer    = TemporalConfirmationBuffer() if temporal_confirm else None
