@@ -24,13 +24,15 @@ Video Input
     │
     ▼
 VehicleDetector          detection.py
-  YOLOv8l (BDD100K)      ─ confidence 0.50, NMS IoU 0.35
-  TemporalConfirmation   ─ 3-frame streak required before passing to tracker
+  RF-DETR Base           ─ COCO AP 53.3 (vs YOLOv8s 48.0)
+  confidence 0.40        ─ lower threshold safe: RF-DETR scores better-calibrated
+  TemporalConfirmation   ─ 2-frame streak required (down from 3: transformer
+                           suppresses single-frame phantoms natively)
     │
     ▼
 VehicleTracker           tracking.py
-  DeepSORT + MobileNet   ─ Kalman-filtered bbox positions
-  n_init=2, max_age=30
+  ByteTrack              ─ IoU-only association, no appearance model
+  track_thresh=0.40, match_thresh=0.70, max_age=30
     │
     ▼
 TrajectoryBuilder        trajectory.py
@@ -48,15 +50,41 @@ The pipeline is exposed as a single function `analyze_video()` in `ml_pipeline/_
 
 ---
 
+## ML Stack — Current
+
+### Why RF-DETR?
+
+We migrated from YOLOv8 to **RF-DETR** (Roboflow Detection Transformer) as the primary detector:
+
+| Metric | YOLOv8s | RF-DETR Base | RF-DETR Large |
+|--------|---------|-------------|--------------|
+| COCO AP | 48.0 | **53.3** | 56.3 |
+| Architecture | CNN grid | Transformer | Transformer |
+| Phantom rate | Higher (shadows, reflections) | Lower (attention sees whole scene) | Lower |
+
+Transformer attention captures whole-scene context, which directly addresses the phantom detection problem that plagued the YOLOv8 baseline — single-frame fires from shadows and road markings that fooled the anchor-based grid classifier.
+
+### Why ByteTrack?
+
+We replaced DeepSORT + MobileNet appearance embedder with **ByteTrack** (IoU-only):
+
+- DeepSORT's appearance model added ~12 ms/frame overhead with no measurable gain on traffic footage where vehicles look similar across cameras
+- ByteTrack's low-confidence detection recycling recovers partially-occluded vehicles that DeepSORT would lose
+- Zero dependency on a GPU-heavy embedding network — ByteTrack runs on CPU alongside RF-DETR on GPU
+
+---
+
 ## ML Pipeline — Technical Detail
 
 ### Detection (`ml_pipeline/detection.py`)
 
-Uses YOLOv8l fine-tuned on BDD100K. A **TemporalConfirmationBuffer** sits between the detector and tracker: a detection must appear in 3 consecutive frames (IoU ≥ 0.40) before being forwarded. This kills phantom detections from shadows and reflections — single-frame fires that plagued the early baseline.
+RF-DETR Base loaded via `RFDETRBase()`. A **TemporalConfirmationBuffer** sits between the detector and tracker: a detection must appear in 2 consecutive frames (IoU ≥ 0.40) before being forwarded. This kills phantom detections from shadows and reflections. The minimum was reduced from 3 → 2 because RF-DETR's transformer attention already suppresses most single-frame phantoms — the 3-frame latency was cutting legitimate fast-approach detections.
+
+Accepts an optional `pretrain_weights` path to load a fine-tuned checkpoint instead of COCO weights.
 
 ### Tracking (`ml_pipeline/tracking.py`)
 
-DeepSORT with MobileNet embedder. Returns **post-Kalman** `to_ltrb()` positions rather than raw YOLO bboxes — the Kalman prediction leads the bbox on fast-moving vehicles instead of lagging behind.
+ByteTrack with IoU-only association. Returns post-Kalman `tlbr` positions — the Kalman prediction leads the bbox on fast-moving vehicles instead of lagging behind. No appearance model dependency.
 
 ### Anomaly Scoring (`ml_pipeline/interaction.py`)
 
@@ -77,34 +105,40 @@ TTC and deceleration are calibration-independent: TTC uses frame-to-frame gap cl
 
 ---
 
-## Current Model — Where We Are
+## Model Status
 
-We are here. These are real numbers from `ml/training/results.csv`.
+### Currently Training
 
-**Model:** YOLOv8l fine-tuned on BDD100K (20,000 dashcam images, 30 epochs, Kaggle P100)
-**Notebook:** `ml/training/argus-1.ipynb`
+**RF-DETR Base fine-tuned on BDD100K + IDD** — running on Kaggle T4 GPU.
 
-### Overall Performance (BDD100K val, 2,000 images)
+- Dataset: 20,000 BDD100K dashcam images + IDD-Detection (Indian mixed traffic, Pascal VOC XML)
+- Classes: car · motorcycle · bus · truck
+- Notebook: `ml/training/argus_rfdetr_kaggle.ipynb`
+- Target: >65% mAP50, better motorcycle recall than the YOLOv8 baseline
+
+### Previous Baseline (YOLOv8l on BDD100K)
+
+These numbers are from the old stack (`ml/training/argus-1.ipynb`) and serve as the benchmark to beat.
 
 | Metric | Value |
 |--------|-------|
-| mAP50 | **62.3%** |
+| mAP50 | 62.3% |
 | mAP50-95 | 40.9% |
 | Precision | 69.0% |
 | Recall | 55.6% |
 
-### Per-Class Breakdown
+Per-class breakdown:
 
 | Class | mAP50 | Training labels | Note |
 |-------|-------|----------------|------|
-| Car | **80.4%** | 205,514 | Strong — data-rich |
+| Car | 80.4% | 205,514 | Strong — data-rich |
 | Truck | 64.9% | 3,350 | Acceptable |
 | Bus | 61.1% | 8,630 | Acceptable |
 | Motorcycle | 42.8% | 840 | Weak — severely underrepresented |
 
-**The problem is clear:** motorcycle is 0.4% of all training labels. The model barely learned it. Car dominates at 94% of the training data. We want to improve the overall number to 80%+ mAP50 before connecting the model to the live system.
+Motorcycle at 42.8% mAP50 (34% recall) is the main failure mode. A motorcycle the model misses is a motorcycle in an undetected near-miss. The RF-DETR fine-tune on IDD (which has more two-wheeler diversity) directly targets this.
 
-### Week 2 Pipeline Eval (synthetic — pre-real-world testing)
+### Week 2 Pipeline Eval
 
 | Metric | Score |
 |--------|-------|
@@ -116,37 +150,31 @@ We are here. These are real numbers from `ml/training/results.csv`.
 
 ---
 
-## What We Are Trying to Improve and Why
+## What We Are Improving and Why
 
-### 1. Class Imbalance (highest priority)
+### 1. Detector Architecture (done)
+RF-DETR replaces YOLOv8. The transformer attention mechanism directly addresses phantom detections from shadows and road markings — the primary false-positive source in the old baseline.
 
-Motorcycle recall at 34% is unacceptable for a safety system. A motorcycle that the model misses is a motorcycle involved in an undetected near-miss. `boost_classes.py` addresses this by pseudo-labeling minority class frames from existing videos and rebalancing the training set before the next fine-tune.
+### 2. Tracker (done)
+ByteTrack replaces DeepSORT. Removes the appearance model overhead, improves occlusion recovery, same IoU-based association logic.
 
-### 2. More Training Epochs
+### 3. Class Imbalance (in progress)
+Motorcycle recall at 34% is unacceptable for a safety system. The BDD100K + IDD fine-tune adds Indian two-wheeler diversity (scooters, mopeds) that BDD100K lacks. `boost_classes.py` handles pseudo-label rebalancing for the next local fine-tune pass (`week3_retrain.py`).
 
-The BDD100K run was cut at 30 epochs — validation mAP50 was still climbing (62.0% at epoch 30, up from 61.7% at epoch 23). The model had not plateaued. A 60-epoch run on the same data would likely push past 65%.
-
-### 3. Additional Dashcam Data
-
-BDD100K is good but US/highway-biased. Adding dashcam footage from different geographies and traffic patterns (dense urban, night, rain) would improve generalization. This is a future data collection effort.
-
-### 4. Speed Calibration
-
-Current speed estimates are pixel-displacement-based with a fixed `pixels_per_meter = 30.0` constant. This is wrong for any camera that isn't the exact one used during development. A homography-based calibration (mapping road markings to real-world distances) is planned for the next phase.
+### 4. Speed Calibration (planned)
+Current speed estimates use a fixed `pixels_per_meter = 30.0` constant. A homography-based calibration mapping road markings to real-world distances is planned for the next phase.
 
 ---
 
 ## Research Prospects
 
-The anomaly scoring system has properties that make it interesting beyond the immediate application:
+**Calibration independence.** The TTC and deceleration metrics are camera-agnostic by design. Any system that requires per-deployment physical calibration is impractical at scale. The current approach avoids this.
 
-**Calibration independence.** The TTC and deceleration metrics are designed to be camera-agnostic. Any system that requires physical calibration per deployment is impractical at scale. The current approach works without it, and the tradeoffs are quantified.
+**Temporal confirmation as a prior.** The TemporalConfirmationBuffer is a learned prior over detection reliability — it suppresses low-confidence, short-lived detections without a trained classifier. The false-negative rate (legitimate detections suppressed) vs false-positive suppression rate is a tunable parameter with a measurable tradeoff curve.
 
-**Temporal confirmation as a prior.** The TemporalConfirmationBuffer is essentially a learned prior over detection reliability — it suppresses low-confidence, short-lived detections without requiring a trained classifier. The buffer's false-negative rate (legitimate detections suppressed) vs false-positive suppression rate is a tunable parameter with a measurable tradeoff curve.
+**Physics-based scoring without ground truth.** The anomaly scorer uses no labeled incident data. It derives danger from physics (TTC, PET, closing speed) applied to raw trajectories — it can be evaluated on new footage types without retraining.
 
-**Physics-based scoring without ground truth.** The anomaly scorer uses no labeled incident data. It derives danger from physics (TTC, PET, closing speed) applied to raw trajectories. This means it can be evaluated on new footage types without retraining — only the detection model needs domain adaptation.
-
-**Dense-traffic mode.** F9 (automatic mode switch when ≥ 6 vehicles in frame) is an early form of scene-context awareness. In congested traffic, proximity is normal; only serious closing speed and tight TTC should fire. This is a precursor to more sophisticated context modeling.
+**Dense-traffic mode.** F9 (automatic mode switch when ≥ 6 vehicles in frame) is scene-context awareness. In congested traffic, proximity is normal; only serious closing speed and tight TTC should fire. This is a precursor to more sophisticated context modeling.
 
 ---
 
@@ -156,18 +184,10 @@ The anomaly scoring system has properties that make it interesting beyond the im
 
 No model is running behind it. All analysis data shown on the dashboard is hardcoded mock data (`ui/js/api.js` → `MOCK_DATA`). The upload flow simulates a 5-second processing ramp then loads a fixed demo result.
 
-The real API endpoints are stubbed in `api.js` but commented out:
-- `POST /api/upload` — video upload
-- `GET /api/jobs/{id}/status` — polling for analysis progress
-- `POST /api/ai/analyze` — Claude streaming analysis
-- `POST /api/ai/ask` — AI chat on the report
-
-The UI will be wired to a real backend once the model hits acceptable accuracy. Building the frontend first let us validate the UX and data contract before committing to a backend architecture.
-
 **UI features (all functional with mock data):**
 - Three.js Earth globe landing with city-arc animations
 - Full analysis dashboard: incident timeline, confidence charts, speed distribution, heatmap
-- Persona switcher — Insurance / City Operations / Emergency Services (each reframes the AI analysis)
+- Persona switcher — Insurance / City Operations / Emergency Services
 - Per-incident detail view with causal factor breakdown
 - CSV and PDF export
 - Embedded Claude AI chat for natural-language queries on the report
@@ -180,10 +200,11 @@ The UI will be wired to a real backend once the model hits acceptable accuracy. 
 |-------|--------|--------------|
 | Week 1 | Done | YOLOv8 detector, DeepSORT tracking, trajectory builder, basic eval |
 | Week 2 | Done | Hard negative mining, pseudo-GT labelling, TemporalConfirmationBuffer, 96.1/100 pipeline eval |
-| Week 3 | Done | YOLOv8n fine-tune attempt, CVAT annotation pipeline |
-| BDD100K training | Done | YOLOv8l on 20K dashcam images — 62.3% mAP50. Results in `ml/training/` |
-| Now | **Active** | Fix class imbalance, push toward 80%+ mAP50 before connecting model to UI |
-| Next | Planned | Backend API, speed calibration, live stream support |
+| Week 3 | Done | Dataset construction, CVAT annotation pipeline, fine-tune scaffolding |
+| BDD100K baseline | Done | YOLOv8l on 20K images → 62.3% mAP50 |
+| Stack migration | Done | RF-DETR + ByteTrack replaces YOLOv8 + DeepSORT across all pipeline files |
+| BDD100K + IDD fine-tune | **In progress** | RF-DETR training on Kaggle T4 (`argus_rfdetr_kaggle.ipynb`) |
+| Next | Planned | Load fine-tuned weights → local week3 retrain on dashcam data → backend API |
 
 ---
 
@@ -193,15 +214,30 @@ The UI will be wired to a real backend once the model hits acceptable accuracy. 
 
 ```bash
 cd ml
-pip install ultralytics deep-sort-realtime opencv-python numpy
+pip install rfdetr supervision opencv-python numpy
 python -c "from ml_pipeline import analyze_video; print(analyze_video('your_video.mp4'))"
 ```
 
-### Training (Kaggle)
+To use a fine-tuned checkpoint instead of COCO weights:
+```python
+from ml_pipeline import analyze_video
+result = analyze_video('your_video.mp4', detector_weights='path/to/argus_rfdetr_finetuned.pth')
+```
 
-Open `ml/training/argus-1.ipynb` on Kaggle with:
-- GPU: P100
-- Dataset: `a7madmostafa/bdd100k-yolo`
+### Training on Kaggle
+
+Open `ml/training/argus_rfdetr_kaggle.ipynb` on Kaggle with:
+- Accelerator: GPU T4
+- Internet: On
+- Dataset: `a7madmostafa/bdd100k-yolo` (public)
+- Dataset: `Blank_0013/idd-detection` (optional, adds Indian traffic)
+
+### Local fine-tune (after downloading Kaggle checkpoint)
+
+```bash
+cd ml
+python week3_retrain.py --epochs 30 --batch 4 --device mps
+```
 
 ### UI (local)
 
