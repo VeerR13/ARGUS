@@ -10,7 +10,7 @@ Parts:
 Usage:
     python week2_eval_complete.py
     python week2_eval_complete.py --footage sample_videos/ --output reports/
-    python week2_eval_complete.py --model yolov8s.pt --conf 0.4 --pixels-per-meter 22
+    python week2_eval_complete.py --model rfdetr-base --conf 0.40 --pixels-per-meter 22
 
 All intermediate artefacts go to --output (default: reports/).
 Videos are read from --footage (default: sample_videos/).

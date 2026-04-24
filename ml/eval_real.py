@@ -1,5 +1,5 @@
 """
-eval_real.py — Real-validation pipeline for YOLOv8 + DeepSORT vehicle detection.
+eval_real.py — Real-validation pipeline for RF-DETR + ByteTrack vehicle detection.
 
 Matches CVAT YOLO 1.1 annotations against live model inference and produces
 a suite of JSON reports, a histogram PNG, and a multi-page PDF summary.
@@ -267,20 +267,22 @@ def run_inference(
     footage_dir: Path,
     annotation_stems: set[str],
 ) -> dict[str, list[tuple[int, float, float, float, float]]]:
-    """Run YOLO inference on .jpg frames that have a matching annotation stem.
+    """Run RF-DETR inference on .jpg frames that have a matching annotation stem.
+
+    temporal_confirm=False: frames are evaluated independently — no streak
+    required since we're comparing single-frame predictions to CVAT labels.
 
     Returns mapping of stem → list of (class_id, cx_norm, cy_norm, w_norm, h_norm).
     """
-    try:
-        from ultralytics import YOLO  # type: ignore[import]
-    except ImportError as exc:
-        raise RuntimeError(
-            "ultralytics is required for inference. "
-            "Install with: pip install ultralytics"
-        ) from exc
+    import sys
+    import os
+    sys.path.insert(0, os.path.dirname(__file__))
+    from ml_pipeline.detection import VehicleDetector  # type: ignore[import]
 
-    model = YOLO(model_path)
+    detector = VehicleDetector(model_path=model_path, temporal_confirm=False)
     predictions: dict[str, list[tuple[int, float, float, float, float]]] = {}
+
+    import cv2  # type: ignore[import]
 
     jpg_files = sorted(footage_dir.rglob("*.jpg"))
     if not jpg_files:
@@ -295,32 +297,25 @@ def run_inference(
         )
         matched_files = jpg_files
 
-    print(f"  [inference] Running on {len(matched_files)} frame(s) ...")
+    print(f"  [inference] Running RF-DETR on {len(matched_files)} frame(s) ...")
 
     for jpg_path in matched_files:
-        import cv2  # type: ignore[import]
         frame = cv2.imread(str(jpg_path))
         if frame is None:
             print(f"  [inference] WARNING: could not read {jpg_path}")
             continue
 
         img_h, img_w = frame.shape[:2]
-
-        results = model(frame, conf=0.4, iou=0.35, verbose=False)[0]
-        boxes_raw = results.boxes
+        dets = detector.detect(frame)
 
         frame_preds: list[tuple[int, float, float, float, float]] = []
-        if boxes_raw is not None and len(boxes_raw) > 0:
-            for box in boxes_raw:
-                cls_id = int(box.cls[0].item())
-                x1, y1, x2, y2 = box.xyxy[0].tolist()
-                bw = x2 - x1
-                bh = y2 - y1
-                cx_n = (x1 + bw / 2) / img_w
-                cy_n = (y1 + bh / 2) / img_h
-                w_n = bw / img_w
-                h_n = bh / img_h
-                frame_preds.append((cls_id, cx_n, cy_n, w_n, h_n))
+        for d in dets:
+            x1, y1, w, h = d["bbox_xywh"]
+            cx_n = (x1 + w / 2) / img_w
+            cy_n = (y1 + h / 2) / img_h
+            w_n  = w / img_w
+            h_n  = h / img_h
+            frame_preds.append((d["class_id"], cx_n, cy_n, w_n, h_n))
 
         predictions[jpg_path.stem] = frame_preds
 
