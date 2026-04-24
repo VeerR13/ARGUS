@@ -8,8 +8,11 @@ Dataset sources:
              Upload as private Kaggle dataset: your-username/bdd100k-raw
 
   IDD     — ~10k train / 2k val, mixed Indian traffic including autorickshaws
+             Pascal VOC XML format (IDD-Detection, NOT the segmentation variant)
              Download: https://idd.insaan.iiit.ac.in/ (registration required)
              Upload as private Kaggle dataset: your-username/idd-detection
+             Expected layout: IDD_Detection/Annotations/{train,val}/{seq}/*.xml
+                              IDD_Detection/JPEGImages/{train,val}/{seq}/*.jpg
 
 Target classes (5):
   0 car  1 motorcycle  2 bus  3 truck  4 bicycle
@@ -26,6 +29,7 @@ Usage on Kaggle:
 import json
 import os
 import shutil
+import xml.etree.ElementTree as ET
 
 import cv2
 import numpy as np
@@ -158,82 +162,111 @@ def convert_bdd100k(split: str, out_img_dir: str, out_lbl_dir: str) -> int:
 
 # ─────────────────────────────────────────────────────────────────────────────
 # IDD conversion
-# IDD-Detection uses bounding box JSON with Cityscapes-like structure
+# IDD-Detection uses Pascal VOC XML annotations.
+# Directory layout:
+#   IDD_Detection/Annotations/{split}/{sequence}/{frame}.xml
+#   IDD_Detection/JPEGImages/{split}/{sequence}/{frame}.jpg
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _parse_idd_json(json_path: str, img_w: int, img_h: int) -> list[str]:
-    """Parse one IDD annotation JSON file and return YOLO label lines."""
-    with open(json_path) as f:
-        data = json.load(f)
+def _parse_idd_xml(xml_path: str) -> tuple[int, int, list[str]]:
+    """
+    Parse one IDD Pascal VOC XML file.
+    Returns (img_w, img_h, yolo_lines).
+    img_w/img_h come from <size> tag; fall back to cv2 read if absent.
+    """
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+
+    size = root.find("size")
+    img_w = int(size.find("width").text)  if size is not None else 0
+    img_h = int(size.find("height").text) if size is not None else 0
 
     lines = []
-    for obj in data.get("annotation", {}).get("object", []):
-        name    = obj.get("name", "")
-        cls_id  = IDD_CLASS_MAP.get(name.lower())
+    for obj in root.findall("object"):
+        name_el = obj.find("name")
+        if name_el is None:
+            continue
+        cls_id = IDD_CLASS_MAP.get(name_el.text.strip().lower())
         if cls_id is None:
             continue
-        poly = obj.get("polygon", {})
-        if not poly:
-            bbox = obj.get("bndbox")
-            if not bbox:
-                continue
-            x1 = float(bbox["xmin"])
-            y1 = float(bbox["ymin"])
-            x2 = float(bbox["xmax"])
-            y2 = float(bbox["ymax"])
-        else:
-            xs = [float(v) for v in poly.get("x", []) if v]
-            ys = [float(v) for v in poly.get("y", []) if v]
-            if not xs or not ys:
-                continue
-            x1, y1, x2, y2 = min(xs), min(ys), max(xs), max(ys)
-        if x2 <= x1 or y2 <= y1:
+        bndbox = obj.find("bndbox")
+        if bndbox is None:
+            continue
+        x1 = float(bndbox.find("xmin").text)
+        y1 = float(bndbox.find("ymin").text)
+        x2 = float(bndbox.find("xmax").text)
+        y2 = float(bndbox.find("ymax").text)
+        if x2 <= x1 or y2 <= y1 or img_w <= 0 or img_h <= 0:
             continue
         lines.append(_xyxy_to_yolo(x1, y1, x2, y2, img_w, img_h, cls_id))
 
-    return lines
+    return img_w, img_h, lines
 
 
 def convert_idd(split: str, out_img_dir: str, out_lbl_dir: str) -> int:
-    """Walk IDD-Detection directory tree and convert to YOLO format."""
+    """
+    Walk IDD-Detection Pascal VOC tree and convert to YOLO format.
+    Annotations: IDD_Detection/Annotations/{split}/{seq}/{frame}.xml
+    Images:      IDD_Detection/JPEGImages/{split}/{seq}/{frame}.jpg
+    """
     print(f"\nConverting IDD {split}...")
     os.makedirs(out_img_dir, exist_ok=True)
     os.makedirs(out_lbl_dir, exist_ok=True)
 
-    split_dir = os.path.join(IDD_IMAGES_DIR, split)
-    if not os.path.isdir(split_dir):
-        print(f"  IDD {split} not found at {split_dir} — skipping")
+    ann_root = os.path.join(IDD_LABELS_DIR, "Annotations", split)
+    img_root = os.path.join(IDD_IMAGES_DIR, "JPEGImages", split)
+
+    if not os.path.isdir(ann_root):
+        print(f"  IDD Annotations/{split} not found at {ann_root} — skipping")
         return 0
 
     written = 0
-    for city in sorted(os.listdir(split_dir)):
-        city_dir = os.path.join(split_dir, city)
-        if not os.path.isdir(city_dir):
+    for seq in sorted(os.listdir(ann_root)):
+        seq_ann = os.path.join(ann_root, seq)
+        seq_img = os.path.join(img_root, seq)
+        if not os.path.isdir(seq_ann):
             continue
-        for fname in os.listdir(city_dir):
-            if not fname.endswith("_gtFine_polygons.json"):
+        for xml_file in os.listdir(seq_ann):
+            if not xml_file.endswith(".xml"):
                 continue
-            json_path = os.path.join(city_dir, fname)
-            # Corresponding image is _leftImg8bit.png
-            img_name  = fname.replace("_gtFine_polygons.json", "_leftImg8bit.png")
-            img_path  = os.path.join(city_dir, img_name)
-            if not os.path.exists(img_path):
-                continue
+            xml_path = os.path.join(seq_ann, xml_file)
+            stem     = os.path.splitext(xml_file)[0]
 
-            img = cv2.imread(img_path)
-            if img is None:
-                continue
-            img_h, img_w = img.shape[:2]
-
-            lines = _parse_idd_json(json_path, img_w, img_h)
+            img_w, img_h, lines = _parse_idd_xml(xml_path)
             if not lines:
                 continue
 
-            stem    = f"{city}_{fname.replace('_gtFine_polygons.json', '')}"
-            dst_img = os.path.join(out_img_dir, "idd_" + stem + ".jpg")
-            dst_lbl = os.path.join(out_lbl_dir, "idd_" + stem + ".txt")
+            # Find corresponding image (.jpg or .png)
+            img_path = None
+            for ext in (".jpg", ".jpeg", ".png"):
+                candidate = os.path.join(seq_img, stem + ext)
+                if os.path.exists(candidate):
+                    img_path = candidate
+                    break
+            if img_path is None:
+                continue
 
-            cv2.imwrite(dst_img, img, [cv2.IMWRITE_JPEG_QUALITY, 90])
+            # If size was missing from XML, read from image
+            if img_w == 0 or img_h == 0:
+                img = cv2.imread(img_path)
+                if img is None:
+                    continue
+                img_h, img_w = img.shape[:2]
+                # Re-parse with correct dimensions
+                _, _, lines = _parse_idd_xml(xml_path)
+                if not lines:
+                    continue
+
+            out_stem = f"idd_{seq}_{stem}"
+            dst_img  = os.path.join(out_img_dir, out_stem + ".jpg")
+            dst_lbl  = os.path.join(out_lbl_dir, out_stem + ".txt")
+
+            if img_path.endswith(".jpg") or img_path.endswith(".jpeg"):
+                shutil.copy(img_path, dst_img)
+            else:
+                img = cv2.imread(img_path)
+                cv2.imwrite(dst_img, img, [cv2.IMWRITE_JPEG_QUALITY, 90])
+
             with open(dst_lbl, "w") as f:
                 f.write("\n".join(lines) + "\n")
             written += 1
