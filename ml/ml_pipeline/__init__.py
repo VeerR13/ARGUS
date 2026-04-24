@@ -20,8 +20,8 @@ from .interaction import detect_incidents
 def analyze_video(
     video_path: str,
     progress_callback=None,
-    model_path: str = "yolov8s.pt",
-    confidence: float = 0.4,
+    model_path: str = "rfdetr-base",  # "rfdetr-large" for higher AP, ~2× slower
+    confidence: float = 0.40,
     pixels_per_meter: float = 30.0,
 ) -> dict:
     """

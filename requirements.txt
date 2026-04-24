@@ -1,0 +1,10 @@
+# Core ML stack
+torch>=2.0.0
+torchvision>=0.15.0
+rfdetr>=1.2.0          # RF-DETR transformer detector
+supervision>=0.27.0    # ByteTrack + detection utilities
+opencv-python>=4.8.0
+
+# Pipeline utilities
+numpy>=1.24.0
+Pillow>=10.0.0
