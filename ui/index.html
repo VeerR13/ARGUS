@@ -459,16 +459,16 @@ footer{
 <section class="stats-section" id="stats">
   <div class="stats-grid">
     <div class="stat reveal">
-      <span class="stat-num" data-target="99.2" data-suffix="%">0<span class="unit">%</span></span>
-      <span class="stat-label">Detection Accuracy</span>
+      <span class="stat-num" data-target="80" data-suffix="%">0<span class="unit">%</span></span>
+      <span class="stat-label">mAP50 After Finetuning</span>
     </div>
     <div class="stat reveal reveal-delay-1">
-      <span class="stat-num" data-target="48" data-suffix="ms">0<span class="unit">ms</span></span>
-      <span class="stat-label">Inference Latency</span>
+      <span class="stat-num" data-target="26" data-suffix="ms">0<span class="unit">ms</span></span>
+      <span class="stat-label">Inference Latency (MPS)</span>
     </div>
     <div class="stat reveal reveal-delay-2">
-      <span class="stat-num" data-target="12" data-prefix="" data-suffix="M+">0<span class="unit">M+</span></span>
-      <span class="stat-label">Vehicles / Day</span>
+      <span class="stat-num" data-target="70" data-prefix="" data-suffix="fps">0<span class="unit">fps</span></span>
+      <span class="stat-label">Jetson Orin (TensorRT)</span>
     </div>
   </div>
 </section>
@@ -487,22 +487,22 @@ footer{
           From edge cameras to centralized dashboards, the pipeline handles the full stack.
         </p>
         <div class="badge-row reveal reveal-delay-3">
-          <span class="badge">RF-DETR</span>
+          <span class="badge">YOLO12x</span>
           <span class="badge">ByteTrack</span>
-          <span class="badge">COCO-80</span>
+          <span class="badge">BDD100K + IDD</span>
           <span class="badge">PyTorch</span>
-          <span class="badge">MPS / CUDA</span>
+          <span class="badge">MPS / CUDA / TRT</span>
         </div>
       </div>
       <div class="reveal reveal-delay-2">
         <div class="mini-spec">
           <div class="spec-row">
             <span class="spec-key">Model</span>
-            <span class="spec-val">RFDETRBase</span>
+            <span class="spec-val">YOLO12x</span>
           </div>
           <div class="spec-row">
-            <span class="spec-key">Backbone</span>
-            <span class="spec-val">LG-DETR / DINOv2</span>
+            <span class="spec-key">mAP50</span>
+            <span class="spec-val">~80% (post-finetune)</span>
           </div>
           <div class="spec-row">
             <span class="spec-key">Tracker</span>
@@ -510,15 +510,15 @@ footer{
           </div>
           <div class="spec-row">
             <span class="spec-key">Input</span>
-            <span class="spec-val">1280 × 720</span>
+            <span class="spec-val">640 × 640</span>
           </div>
           <div class="spec-row">
             <span class="spec-key">Classes</span>
-            <span class="spec-val">car · truck · bus · moto</span>
+            <span class="spec-val">car · truck · bus · moto · bicycle</span>
           </div>
           <div class="spec-row">
             <span class="spec-key">Throughput</span>
-            <span class="spec-val">~24 fps on MPS</span>
+            <span class="spec-val">~38 fps MPS · ~70 fps TRT</span>
           </div>
           <div class="spec-row">
             <span class="spec-key">Training</span>

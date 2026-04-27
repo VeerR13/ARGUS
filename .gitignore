@@ -39,3 +39,5 @@ ui/assets/*.avi
 # macOS
 .DS_Store
 **/.DS_Store
+.gstack/
+.vercel

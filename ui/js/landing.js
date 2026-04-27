@@ -62,6 +62,7 @@ function greatCirclePoints(lat1, lon1, lat2, lon2, n, r) {
 
 function initScene() {
   const canvas = document.getElementById('earth-canvas');
+  if (!canvas || canvas.dataset.disabled === 'true') return;
 
   // Renderer
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
