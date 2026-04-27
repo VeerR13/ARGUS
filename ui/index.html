@@ -224,6 +224,18 @@ body::before{
 }
 @keyframes scrollpulse{0%,100%{transform:scaleY(1);opacity:.4}50%{transform:scaleY(.6);opacity:.8}}
 
+/* sound toggle */
+#sound-btn{
+  position:absolute;bottom:28px;right:32px;z-index:10;
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .5s var(--ease),background .2s;
+  padding:0;
+}
+#sound-btn.show{opacity:1}
+#sound-btn:hover{background:rgba(255,255,255,.13)}
+
 /* ── section base ─────────────────────────────────────────── */
 .section{padding:100px 40px;max-width:1200px;margin:0 auto}
 .section-wide{padding:100px 40px;max-width:1400px;margin:0 auto}
@@ -453,6 +465,20 @@ footer{
     <span>Scroll</span>
     <div class="scroll-line"></div>
   </div>
+
+  <button id="sound-btn" title="Toggle sound" onclick="toggleSound()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <g id="snd-waves">
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+      </g>
+      <g id="snd-off" style="display:none">
+        <line x1="23" y1="9" x2="17" y2="15"/>
+        <line x1="17" y1="9" x2="23" y2="15"/>
+      </g>
+    </svg>
+  </button>
 </section>
 
 <!-- ═══ STATS ════════════════════════════════════════════════ -->
@@ -720,6 +746,55 @@ var counterRo = new IntersectionObserver(entries=>{
   });
 },{threshold:.3});
 document.querySelectorAll('.stat-num[data-target]').forEach(el=>counterRo.observe(el));
+
+/* ── Sound ───────────────────────────────────────────────── */
+var _audioOn = false;
+var _SND_VOL = 0.13;
+
+function _fadeVol(to) {
+  if (!hv) return;
+  var from = hv.volume, steps = 40, s = 0;
+  var id = setInterval(function(){
+    s++;
+    hv.volume = Math.max(0, Math.min(1, from + (to - from) * s / steps));
+    if (s >= steps) clearInterval(id);
+  }, 25);
+}
+
+function _enableSound() {
+  if (_audioOn) return;
+  _audioOn = true;
+  hv.muted = false;
+  hv.volume = 0;
+  _fadeVol(_SND_VOL);
+  _setSoundIcon(true);
+  document.getElementById('sound-btn').classList.add('show');
+}
+
+function toggleSound() {
+  if (!_audioOn) { _enableSound(); return; }
+  if (hv.volume > 0) {
+    _fadeVol(0);
+    setTimeout(function(){ hv.muted = true; }, 1050);
+    _setSoundIcon(false);
+  } else {
+    hv.muted = false;
+    _fadeVol(_SND_VOL);
+    _setSoundIcon(true);
+  }
+}
+
+function _setSoundIcon(on) {
+  document.getElementById('snd-waves').style.display = on ? '' : 'none';
+  document.getElementById('snd-off').style.display   = on ? 'none' : '';
+}
+
+// Show muted button after reveal, auto-enable on first scroll
+setTimeout(function(){
+  var sb = document.getElementById('sound-btn');
+  if(sb){ _setSoundIcon(false); sb.classList.add('show'); }
+}, 2800);
+window.addEventListener('scroll', _enableSound, {once:true, passive:true});
 
 /* ── Access form ─────────────────────────────────────────── */
 function submitAccess(){
