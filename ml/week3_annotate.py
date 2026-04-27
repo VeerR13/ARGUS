@@ -24,8 +24,6 @@ import os
 import shutil
 import sys
 import zipfile
-from collections import OrderedDict
-
 import cv2
 import numpy as np
 
