@@ -20,7 +20,7 @@ from .interaction import detect_incidents
 def analyze_video(
     video_path: str,
     progress_callback=None,
-    model_path: str = "rfdetr-base",  # "rfdetr-large" for higher AP, ~2× slower
+    model_path: str = "yolo12x.pt",
     confidence: float = 0.40,
     pixels_per_meter: float = 30.0,
 ) -> dict:
@@ -30,9 +30,9 @@ def analyze_video(
     Args:
         video_path        : Path to video file (MP4, AVI, MOV)
         progress_callback : Optional function(percent: int) called each frame
-        model_path        : YOLOv8 weights file
+        model_path        : YOLO12x weights file (pretrained or finetuned)
         confidence        : Detection confidence threshold
-        pixels_per_meter  : Rough scale factor for speed estimation
+        pixels_per_meter  : Rough scale factor for speed estimation (must be > 0)
 
     Returns:
         {
@@ -41,6 +41,9 @@ def analyze_video(
         }
     """
     video_id = str(uuid.uuid4())
+
+    if pixels_per_meter <= 0:
+        raise ValueError(f"pixels_per_meter must be > 0, got {pixels_per_meter}")
 
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():

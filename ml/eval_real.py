@@ -1,5 +1,5 @@
 """
-eval_real.py — Real-validation pipeline for RF-DETR + ByteTrack vehicle detection.
+eval_real.py — Real-validation pipeline for YOLO12x + ByteTrack vehicle detection.
 
 Matches CVAT YOLO 1.1 annotations against live model inference and produces
 a suite of JSON reports, a histogram PNG, and a multi-page PDF summary.
@@ -29,7 +29,6 @@ from typing import Any
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
 from matplotlib.backends.backend_pdf import PdfPages
 import numpy as np
 
@@ -267,7 +266,7 @@ def run_inference(
     footage_dir: Path,
     annotation_stems: set[str],
 ) -> dict[str, list[tuple[int, float, float, float, float]]]:
-    """Run RF-DETR inference on .jpg frames that have a matching annotation stem.
+    """Run YOLO12x inference on .jpg frames that have a matching annotation stem.
 
     temporal_confirm=False: frames are evaluated independently — no streak
     required since we're comparing single-frame predictions to CVAT labels.
@@ -275,14 +274,11 @@ def run_inference(
     Returns mapping of stem → list of (class_id, cx_norm, cy_norm, w_norm, h_norm).
     """
     import sys
-    import os
     sys.path.insert(0, os.path.dirname(__file__))
     from ml_pipeline.detection import VehicleDetector  # type: ignore[import]
 
     detector = VehicleDetector(model_path=model_path, temporal_confirm=False)
     predictions: dict[str, list[tuple[int, float, float, float, float]]] = {}
-
-    import cv2  # type: ignore[import]
 
     jpg_files = sorted(footage_dir.rglob("*.jpg"))
     if not jpg_files:
@@ -297,7 +293,7 @@ def run_inference(
         )
         matched_files = jpg_files
 
-    print(f"  [inference] Running RF-DETR on {len(matched_files)} frame(s) ...")
+    print(f"  [inference] Running YOLO12x on {len(matched_files)} frame(s) ...")
 
     for jpg_path in matched_files:
         frame = cv2.imread(str(jpg_path))

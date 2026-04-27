@@ -1,30 +1,19 @@
 """
-ByteTrack vehicle tracker.
+ByteTrack vehicle tracker (IoU-only, no appearance model).
 
-Replaces DeepSORT + MobileNet appearance embeddings with ByteTrack:
-  - DeepSORT root cause: MobileNet embeddings trained on pedestrians fail on vehicles
-    seen from dashcam angles with motion blur and partial occlusion, producing
-    phantom tracks (65.6% FP rate on dashcam footage)
-  - ByteTrack is IoU-only — no appearance model — so motion blur and occlusion
-    don't corrupt the association step
-  - ByteTrack's "byte" strategy: high-confidence detections match first (SORT-style
-    Hungarian + Kalman), then low-confidence detections are matched against
-    unconfirmed tracks, recovering partially occluded vehicles that would otherwise
-    be lost and re-initialised as new phantom tracks
+Uses supervision's ByteTrack implementation. High-confidence detections
+associate first via Hungarian + Kalman; low-confidence detections are matched
+against unconfirmed tracks, recovering partially-occluded vehicles that pure
+SORT would lose and re-initialise as phantom tracks.
 
-ByteTrack paper: Zhang et al., "ByteTrack: Multi-Object Tracking by Associating
-Every Detection Box", ECCV 2022.
+Reference: Zhang et al., "ByteTrack", ECCV 2022.
 """
+
+from __future__ import annotations
 
 import numpy as np
 import supervision as sv
 
-VEHICLE_CLASSES = {
-    2: "car",
-    3: "motorcycle",
-    5: "bus",
-    7: "truck",
-}
 
 
 class VehicleTracker:
@@ -75,6 +64,8 @@ class VehicleTracker:
 
         tracked = self.tracker.update_with_detections(sv_dets)
 
+        name_map = {d["class_id"]: d["class_name"] for d in detections}
+
         active = []
         for i in range(len(tracked)):
             cls_id = int(tracked.class_id[i])
@@ -82,6 +73,6 @@ class VehicleTracker:
             active.append({
                 "track_id":  int(tracked.tracker_id[i]),
                 "bbox_ltrb": [int(x1), int(y1), int(x2), int(y2)],
-                "class_name": VEHICLE_CLASSES.get(cls_id, "car"),
+                "class_name": name_map.get(cls_id, "car"),
             })
         return active
