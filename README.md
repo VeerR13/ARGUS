@@ -208,11 +208,8 @@ ARGUS/
 │   │   ├── trajectory.py              # TrajectoryBuilder
 │   │   └── interaction.py             # InteractionScorer (9-filter anomaly logic)
 │   ├── training/
-│   │   ├── argus_yolo12x_run2.ipynb   # Kaggle notebook (Run 2, bug-fixed)
-│   │   ├── argus_lightning_train.py   # Lightning AI script (current run)
-│   │   └── argus_yolo12x_kaggle.ipynb # Kaggle notebook (Run 1, archived)
-│   ├── eval_real.py                   # Eval against CVAT YOLO annotations
-│   └── week3_annotate.py              # Frame extraction for human annotation
+│   │   └── argus_lightning_train.py   # Training script (Lightning AI, Run 2)
+│   └── eval_real.py                   # Eval against CVAT YOLO annotations
 ├── ui/                                # Frontend — deployed to Vercel
 │   ├── index.html                     # Landing page (dark editorial, ambient sound)
 │   ├── dashboard.html                 # Analysis results
