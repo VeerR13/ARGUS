@@ -1,8 +1,0 @@
-# ARGUS-ML training dataset
-
-path: ./dataset
-train: train/images
-val:   val/images
-
-nc: 4
-names: ['car', 'motorcycle', 'bus', 'truck']

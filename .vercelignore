@@ -1,0 +1,19 @@
+# ML training artifacts — not needed for web deployment
+ml/
+
+# Model weights
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+
+# Large demo videos (tracked locally, not in git)
+ui/assets/output_dashcam_annotated.mp4
+ui/assets/output_dashcam_annotated_web.mp4
+ui/assets/output_dashcam_h264.mp4
+
+# Dev tooling
+.claude/
+.gstack/
+.git/
+*.ipynb
