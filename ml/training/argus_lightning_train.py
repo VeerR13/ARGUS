@@ -1,45 +1,33 @@
 """
 ARGUS — YOLO12x Training Script for Lightning AI
-Run inside a Lightning AI Studio terminal with:
+Run inside a Lightning AI Studio terminal:
     tmux new -s argus
-    python argus_lightning_train.py
-    Ctrl+B, D  (detach — close browser safely)
+    python3 argus_lightning_train.py
+    Ctrl+B, D  (detach — safe to close browser)
 """
 
-import os, glob, json, shutil, random
-import xml.etree.ElementTree as ET
+import os, glob, shutil, random, subprocess
 from pathlib import Path
 from collections import Counter
 
-# ── Paths (Lightning AI Studio) ───────────────────────────────────────────────
+# ── Paths ─────────────────────────────────────────────────────────────────────
 BASE      = Path('/teamspace/studios/this_studio')
-DATA_DIR  = BASE / 'data'
-BDD100K_DIR = DATA_DIR / 'bdd100k'
-IDD_DIR     = DATA_DIR / 'idd' / 'IDD_Detection'
+BDD_DIR   = BASE / 'data' / 'bdd100k'
 OUT_DIR   = BASE / 'argus_dataset'
 MODEL_OUT = BASE / 'models'
 
 # ── Training config ───────────────────────────────────────────────────────────
 EPOCHS  = 60
-BATCH   = 8       # T4 16GB single GPU — use 16 if you have A10G/A100
+BATCH   = 8
 IMGSZ   = 640
 WORKERS = 4
 MODEL   = 'yolo12x.pt'
 
-BDD_MAX_TRAIN = 15_000
-BDD_MAX_VAL   =  2_500
-MOTO_MULT     = 2
+BDD_MAX_TRAIN = 70_000   # use full BDD100K
+BDD_MAX_VAL   = 10_000
+MOTO_MULT     = 3        # ×3 resampling — motorcycle still rare in BDD
 
 CLASS_NAMES = ['car', 'motorcycle', 'bus', 'truck', 'bicycle']
-
-IDD_MAP = {
-    'car': 0, 'taxi': 0, 'van': 0, 'jeep': 0,
-    'motorcycle': 1, 'scooter': 1, 'moped': 1,
-    'bus': 2, 'minibus': 2,
-    'truck': 3, 'pickup': 3, 'trailer': 3, 'tipper': 3,
-    'bicycle': 4,
-    'autorickshaw': 0, 'auto-rickshaw': 0, 'e-rickshaw': 0,
-}
 
 random.seed(42)
 
@@ -49,21 +37,32 @@ for split in ('train', 'valid'):
 MODEL_OUT.mkdir(parents=True, exist_ok=True)
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
-def xyxy2yolo(x1, y1, x2, y2, W, H, cls):
-    cx = max(0.001, min(0.999, (x1+x2)/2/W))
-    cy = max(0.001, min(0.999, (y1+y2)/2/H))
-    w  = max(0.001, min(0.999, (x2-x1)/W))
-    h  = max(0.001, min(0.999, (y2-y1)/H))
-    return f'{cls} {cx:.6f} {cy:.6f} {w:.6f} {h:.6f}'
+# ── Download extra datasets via Kaggle ───────────────────────────────────────
+def kaggle_download(ref, dest):
+    dest = Path(dest)
+    if dest.exists() and any(dest.rglob('*.jpg')):
+        print(f'  {ref}: already present, skipping download')
+        return
+    dest.mkdir(parents=True, exist_ok=True)
+    print(f'  Downloading {ref}...')
+    subprocess.run(
+        ['kaggle', 'datasets', 'download', '-d', ref, '-p', str(dest), '--unzip'],
+        check=True
+    )
+
+print('=== Downloading extra datasets ===')
+kaggle_download('mohammadsadeqasghari/bdd100k-5class-yolov5',
+                BASE / 'data' / 'bdd5class')
+kaggle_download('dataclusterlabs/indian-vehicle-dataset',
+                BASE / 'data' / 'indian_vehicles')
 
 
-# ── BDD100K — class-remapped ──────────────────────────────────────────────────
-def _discover_bdd_classes(bdd_root):
-    import yaml as _yaml
+# ── BDD class mapping ─────────────────────────────────────────────────────────
+def discover_bdd_classes(bdd_root):
+    import yaml
     for yf in sorted(glob.glob(f'{bdd_root}/**/*.yaml', recursive=True)):
         try:
-            d = _yaml.safe_load(open(yf))
+            d = yaml.safe_load(open(yf))
             if isinstance(d, dict) and 'names' in d:
                 names = d['names']
                 if isinstance(names, list) and any('car' in n.lower() for n in names):
@@ -72,12 +71,12 @@ def _discover_bdd_classes(bdd_root):
             pass
     return None, None
 
-bdd_name_to_id, bdd_class_list = _discover_bdd_classes(BDD100K_DIR)
+bdd_name_to_id, bdd_class_list = discover_bdd_classes(BDD_DIR)
 if bdd_class_list:
-    print(f'BDD100K classes auto-detected: {bdd_class_list}')
+    print(f'BDD classes: {bdd_class_list}')
 else:
     bdd_name_to_id = {'car': 2, 'truck': 3, 'bus': 4, 'motorcycle': 6, 'bicycle': 0}
-    print(f'BDD100K: yaml not found — using hardcoded fallback: {bdd_name_to_id}')
+    print(f'BDD: yaml not found — using hardcoded fallback')
 
 _SYNONYMS = {
     'car':        ['car', 'vehicle'],
@@ -95,10 +94,13 @@ for our_id, our_name in enumerate(CLASS_NAMES):
 print(f'BDD_TO_ARGUS: {BDD_TO_ARGUS}')
 
 
-def remap_bdd_split(src_img_dir, src_lbl_dir, dst_img, dst_lbl, max_n, prefix='bdd_'):
+# ── Generic YOLO-format copy with class remapping ────────────────────────────
+def copy_yolo_split(src_img_dir, src_lbl_dir, dst_img, dst_lbl,
+                    class_remap, max_n, prefix):
     os.makedirs(dst_img, exist_ok=True)
     os.makedirs(dst_lbl, exist_ok=True)
-    imgs = [f for f in os.listdir(src_img_dir) if f.lower().endswith(('.jpg','.jpeg','.png'))]
+    imgs = [f for f in os.listdir(src_img_dir)
+            if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
     random.shuffle(imgs)
     kept, stats = 0, Counter()
     for img_f in imgs:
@@ -114,132 +116,201 @@ def remap_bdd_split(src_img_dir, src_lbl_dir, dst_img, dst_lbl, max_n, prefix='b
             if not parts:
                 continue
             try:
-                bdd_cls = int(parts[0])
+                src_cls = int(parts[0])
             except ValueError:
                 continue
-            argus_cls = BDD_TO_ARGUS.get(bdd_cls)
-            if argus_cls is not None:
-                lines.append(f'{argus_cls} {" ".join(parts[1:])}')
-                stats[CLASS_NAMES[argus_cls]] += 1
+            dst_cls = class_remap.get(src_cls)
+            if dst_cls is not None:
+                lines.append(f'{dst_cls} {" ".join(parts[1:])}')
+                stats[CLASS_NAMES[dst_cls]] += 1
         if not lines:
             continue
-        shutil.copy(os.path.join(src_img_dir, img_f), os.path.join(dst_img, prefix + img_f))
+        shutil.copy(os.path.join(src_img_dir, img_f),
+                    os.path.join(dst_img, prefix + img_f))
         with open(os.path.join(dst_lbl, prefix + stem + '.txt'), 'w') as wf:
             wf.write('\n'.join(lines) + '\n')
         kept += 1
-    print(f'  kept={kept:,}  classes: {dict(stats)}')
+    print(f'  kept={kept:,}  {dict(stats)}')
     return kept
 
 
-def _find_bdd_dirs(split):
+def find_split_dirs(dataset_root, split):
+    """Try common YOLO directory layouts."""
     candidates = [
-        (f'{BDD100K_DIR}/{split}/images', f'{BDD100K_DIR}/{split}/labels'),
-        (f'{BDD100K_DIR}/images/{split}', f'{BDD100K_DIR}/labels/{split}'),
-        (f'{BDD100K_DIR}/{split}',        f'{BDD100K_DIR}/{split}'),
+        (f'{dataset_root}/{split}/images', f'{dataset_root}/{split}/labels'),
+        (f'{dataset_root}/images/{split}', f'{dataset_root}/labels/{split}'),
+        (f'{dataset_root}/{split}',         f'{dataset_root}/{split}'),
     ]
     for si, sl in candidates:
-        if os.path.isdir(si):
+        if os.path.isdir(si) and os.path.isdir(sl):
             return si, sl
     return None, None
 
 
-print('\n--- BDD100K ---')
-bdd_train_img, bdd_train_lbl = _find_bdd_dirs('train')
-bdd_val_img,   bdd_val_lbl   = _find_bdd_dirs('val')
+# ── BDD100K (70k, remapped) ───────────────────────────────────────────────────
+print('\n=== BDD100K (full 70k) ===')
+bdd_tr_img, bdd_tr_lbl = find_split_dirs(BDD_DIR, 'train')
+bdd_va_img, bdd_va_lbl = find_split_dirs(BDD_DIR, 'val')
 
-n_bdd_train = 0
-if bdd_train_img:
-    print(f'BDD100K train ({BDD_MAX_TRAIN:,} cap):')
-    n_bdd_train = remap_bdd_split(
-        bdd_train_img, bdd_train_lbl,
-        OUT_DIR / 'train' / 'images', OUT_DIR / 'train' / 'labels', BDD_MAX_TRAIN)
+n_bdd_train = n_bdd_val = 0
+if bdd_tr_img:
+    print(f'Train (cap {BDD_MAX_TRAIN:,}):')
+    n_bdd_train = copy_yolo_split(
+        bdd_tr_img, bdd_tr_lbl,
+        OUT_DIR/'train'/'images', OUT_DIR/'train'/'labels',
+        BDD_TO_ARGUS, BDD_MAX_TRAIN, 'bdd_')
 else:
-    print('BDD100K train: not found')
+    print('BDD train not found')
 
-n_bdd_val = 0
-if bdd_val_img:
-    print(f'BDD100K val ({BDD_MAX_VAL:,} cap):')
-    n_bdd_val = remap_bdd_split(
-        bdd_val_img, bdd_val_lbl,
-        OUT_DIR / 'valid' / 'images', OUT_DIR / 'valid' / 'labels', BDD_MAX_VAL)
+if bdd_va_img:
+    print(f'Val (cap {BDD_MAX_VAL:,}):')
+    n_bdd_val = copy_yolo_split(
+        bdd_va_img, bdd_va_lbl,
+        OUT_DIR/'valid'/'images', OUT_DIR/'valid'/'labels',
+        BDD_TO_ARGUS, BDD_MAX_VAL, 'bdd_')
 else:
-    print('BDD100K val: not found')
+    print('BDD val not found')
 
-_bad = sum(
-    1 for lbl in glob.glob(str(OUT_DIR / 'train' / 'labels' / 'bdd_*.txt'))
+bad = sum(
+    1 for lbl in glob.glob(str(OUT_DIR/'train'/'labels'/'bdd_*.txt'))
     for row in open(lbl).read().splitlines()
     if row.strip() and int(row.split()[0]) >= len(CLASS_NAMES)
 )
-print(f'Sanity: {_bad} out-of-range labels in BDD train (should be 0)')
+print(f'Sanity — out-of-range BDD labels: {bad} (must be 0)')
 
 
-# ── IDD ───────────────────────────────────────────────────────────────────────
-def parse_idd_xml(xml_path):
-    import cv2
-    root = ET.parse(xml_path).getroot()
-    size = root.find('size')
-    W = int(size.find('width').text)  if size is not None else 0
-    H = int(size.find('height').text) if size is not None else 0
-    lines = []
-    for obj in root.findall('object'):
-        name_el = obj.find('name')
-        if name_el is None: continue
-        cls = IDD_MAP.get(name_el.text.strip().lower())
-        if cls is None: continue
-        b = obj.find('bndbox')
-        if b is None: continue
-        x1,y1,x2,y2 = (float(b.find(k).text) for k in ('xmin','ymin','xmax','ymax'))
-        if x2<=x1 or y2<=y1 or W<=0 or H<=0: continue
-        lines.append(xyxy2yolo(x1,y1,x2,y2,W,H,cls))
-    return W, H, lines
+# ── BDD 5-class supplement ────────────────────────────────────────────────────
+print('\n=== BDD 5-class supplement ===')
+bdd5_root = BASE / 'data' / 'bdd5class'
 
-def process_idd(split):
-    import cv2
-    out_split = 'valid' if split == 'val' else split
-    out_img = OUT_DIR / out_split / 'images'
-    out_lbl = OUT_DIR / out_split / 'labels'
-    ann_root = os.path.join(IDD_DIR, 'Annotations', split)
-    img_root = os.path.join(IDD_DIR, 'JPEGImages', split)
-    if not os.path.isdir(ann_root):
-        print(f'IDD {split}: not found — skipping'); return 0
-    n = 0
-    for seq in sorted(os.listdir(ann_root)):
-        seq_ann = os.path.join(ann_root, seq)
-        seq_img = os.path.join(img_root, seq)
-        if not os.path.isdir(seq_ann): continue
-        for xml_file in os.listdir(seq_ann):
-            if not xml_file.endswith('.xml'): continue
-            stem = os.path.splitext(xml_file)[0]
-            W, H, lines = parse_idd_xml(os.path.join(seq_ann, xml_file))
-            if not lines: continue
-            img_path = None
-            for ext in ('.jpg','.jpeg','.png'):
-                c = os.path.join(seq_img, stem+ext)
-                if os.path.exists(c): img_path=c; break
-            if img_path is None: continue
-            if W==0 or H==0:
-                img = cv2.imread(img_path)
-                if img is None: continue
-                H, W = img.shape[:2]
-                _, _, lines = parse_idd_xml(os.path.join(seq_ann, xml_file))
-                if not lines: continue
-            out_stem = f'idd_{seq}_{stem}'
-            dst_img = out_img / (out_stem + '.jpg')
-            if img_path.endswith(('.jpg','.jpeg')):
-                shutil.copy(img_path, dst_img)
-            else:
-                cv2.imwrite(str(dst_img), cv2.imread(img_path), [cv2.IMWRITE_JPEG_QUALITY,90])
-            (out_lbl / (out_stem + '.txt')).write_text('\n'.join(lines)+'\n')
-            n += 1
-    print(f'IDD {split}: {n} images')
-    return n
+def discover_5class_map(root):
+    """Detect if labels already use our 0-4 scheme."""
+    import yaml
+    for yf in sorted(glob.glob(f'{root}/**/*.yaml', recursive=True)):
+        try:
+            d = yaml.safe_load(open(yf))
+            if isinstance(d, dict) and 'names' in d:
+                names = d['names']
+                if isinstance(names, list) and len(names) <= 6:
+                    print(f'  5-class yaml names: {names}')
+                    # Build remap: match to our CLASS_NAMES
+                    remap = {}
+                    for i, n in enumerate(names):
+                        nl = n.lower().strip()
+                        for our_id, our_name in enumerate(CLASS_NAMES):
+                            if any(syn in nl for syn in _SYNONYMS.get(our_name, [our_name])):
+                                remap[i] = our_id
+                                break
+                    return remap
+        except Exception:
+            pass
+    return {i: i for i in range(5)}  # assume already 0-4
 
-print('\n--- IDD ---')
-n_idd_train = process_idd('train')
-n_idd_val   = process_idd('val')
+remap_5cls = discover_5class_map(bdd5_root)
+print(f'  5-class remap: {remap_5cls}')
+
+b5_tr_img, b5_tr_lbl = find_split_dirs(bdd5_root, 'train')
+b5_va_img, b5_va_lbl = find_split_dirs(bdd5_root, 'val')
+b5_va_img = b5_va_img or find_split_dirs(bdd5_root, 'valid')[0]
+b5_va_lbl = b5_va_lbl or find_split_dirs(bdd5_root, 'valid')[1]
+
+n_b5_train = n_b5_val = 0
+if b5_tr_img:
+    print('Train:')
+    n_b5_train = copy_yolo_split(
+        b5_tr_img, b5_tr_lbl,
+        OUT_DIR/'train'/'images', OUT_DIR/'train'/'labels',
+        remap_5cls, 50_000, 'bdd5_')
+if b5_va_img:
+    print('Val:')
+    n_b5_val = copy_yolo_split(
+        b5_va_img, b5_va_lbl,
+        OUT_DIR/'valid'/'images', OUT_DIR/'valid'/'labels',
+        remap_5cls, 5_000, 'bdd5_')
+
+
+# ── Indian Vehicle Dataset ────────────────────────────────────────────────────
+print('\n=== Indian Vehicle Dataset ===')
+ivd_root = BASE / 'data' / 'indian_vehicles'
+
+def process_flat_yolo(dataset_root, dst_img, dst_lbl, class_remap, split_ratio=0.85, prefix='ivd_'):
+    """Handle flat directories with no train/val split."""
+    os.makedirs(dst_img, exist_ok=True)
+    os.makedirs(dst_lbl, exist_ok=True)
+
+    # Find any subdirectory with images
+    all_imgs = list(Path(dataset_root).rglob('*.jpg')) + \
+               list(Path(dataset_root).rglob('*.jpeg')) + \
+               list(Path(dataset_root).rglob('*.png'))
+    random.shuffle(all_imgs)
+    kept, stats = 0, Counter()
+
+    for img_path in all_imgs:
+        # Look for label alongside image or in parallel labels/ dir
+        stem = img_path.stem
+        lbl_candidates = [
+            img_path.parent / (stem + '.txt'),
+            img_path.parent.parent / 'labels' / (stem + '.txt'),
+        ]
+        lbl_src = next((p for p in lbl_candidates if p.exists()), None)
+        if not lbl_src:
+            continue
+        lines = []
+        for row in open(lbl_src).read().strip().splitlines():
+            parts = row.split()
+            if not parts:
+                continue
+            try:
+                src_cls = int(parts[0])
+            except ValueError:
+                continue
+            dst_cls = class_remap.get(src_cls)
+            if dst_cls is not None:
+                lines.append(f'{dst_cls} {" ".join(parts[1:])}')
+                stats[CLASS_NAMES[dst_cls]] += 1
+        if not lines:
+            continue
+        shutil.copy(str(img_path), os.path.join(dst_img, prefix + img_path.name))
+        with open(os.path.join(dst_lbl, prefix + stem + '.txt'), 'w') as wf:
+            wf.write('\n'.join(lines) + '\n')
+        kept += 1
+    print(f'  kept={kept:,}  {dict(stats)}')
+    return kept
+
+# Try standard split first, fall back to flat processing
+ivd_tr_img, ivd_tr_lbl = find_split_dirs(ivd_root, 'train')
+n_ivd = 0
+if ivd_tr_img:
+    import yaml
+    ivd_remap = {}
+    for yf in sorted(glob.glob(f'{ivd_root}/**/*.yaml', recursive=True)):
+        try:
+            d = yaml.safe_load(open(yf))
+            if isinstance(d, dict) and 'names' in d:
+                for i, n in enumerate(d['names']):
+                    for our_id, our_name in enumerate(CLASS_NAMES):
+                        if any(s in n.lower() for s in _SYNONYMS.get(our_name, [our_name])):
+                            ivd_remap[i] = our_id
+                break
+        except Exception:
+            pass
+    print(f'  IVD remap: {ivd_remap}')
+    print('Train:')
+    n_ivd = copy_yolo_split(
+        ivd_tr_img, ivd_tr_lbl,
+        OUT_DIR/'train'/'images', OUT_DIR/'train'/'labels',
+        ivd_remap, 20_000, 'ivd_')
+else:
+    print('  No standard split — trying flat layout...')
+    ivd_remap = {0: 0, 1: 3, 2: 2, 3: 1, 4: 4}  # common Indian dataset ordering
+    n_ivd = process_flat_yolo(ivd_root,
+                              OUT_DIR/'train'/'images',
+                              OUT_DIR/'train'/'labels',
+                              ivd_remap)
 
 
 # ── Motorcycle resampling ─────────────────────────────────────────────────────
+print('\n=== Motorcycle resampling ===')
 def resample_class(dataset_dir, cls_id, multiplier):
     img_dir = dataset_dir / 'train' / 'images'
     lbl_dir = dataset_dir / 'train' / 'labels'
@@ -265,23 +336,25 @@ def resample_class(dataset_dir, cls_id, multiplier):
     return added
 
 n_moto = resample_class(OUT_DIR, cls_id=1, multiplier=MOTO_MULT)
-print(f'\nMotorcycle copies added: {n_moto:,}')
-
-print(f'\nDataset summary:')
-print(f'  Train: BDD={n_bdd_train} + IDD={n_idd_train} + moto_resamp={n_moto} = {n_bdd_train+n_idd_train+n_moto}')
-print(f'  Val:   BDD={n_bdd_val}   + IDD={n_idd_val}   = {n_bdd_val+n_idd_val}')
+print(f'Motorcycle copies added: {n_moto:,} (×{MOTO_MULT})')
 
 
-# ── data.yaml ─────────────────────────────────────────────────────────────────
+# ── Summary + data.yaml ───────────────────────────────────────────────────────
+n_train = n_bdd_train + n_b5_train + n_ivd + n_moto
+n_val   = n_bdd_val   + n_b5_val
+
+print(f'\n=== Dataset summary ===')
+print(f'Train: BDD={n_bdd_train:,} + BDD5cls={n_b5_train:,} + IVD={n_ivd:,} + moto_resamp={n_moto:,} = {n_train:,}')
+print(f'Val:   BDD={n_bdd_val:,} + BDD5cls={n_b5_val:,} = {n_val:,}')
+
 yaml_path = OUT_DIR / 'data.yaml'
 yaml_path.write_text(f"""path: {OUT_DIR.resolve()}
 train: train/images
 val:   valid/images
-
 nc: {len(CLASS_NAMES)}
 names: {CLASS_NAMES}
 """)
-print(f'\ndata.yaml written to {yaml_path}')
+print(f'data.yaml written.')
 
 
 # ── Train ─────────────────────────────────────────────────────────────────────
@@ -290,30 +363,31 @@ from ultralytics import YOLO
 model = YOLO(MODEL)
 
 results = model.train(
-    data    = str(yaml_path),
-    epochs  = EPOCHS,
-    batch   = BATCH,
-    imgsz   = IMGSZ,
-    device  = '0',          # single GPU on Lightning AI free tier
-    workers = WORKERS,
-    project = str(MODEL_OUT),
-    name    = 'yolo12x_bdd_idd',
-    exist_ok= True,
+    data      = str(yaml_path),
+    epochs    = EPOCHS,
+    batch     = BATCH,
+    imgsz     = IMGSZ,
+    device    = '0',
+    workers   = WORKERS,
+    project   = str(MODEL_OUT),
+    name      = 'yolo12x_bdd_idd',
+    exist_ok  = True,
     optimizer     = 'AdamW',
-    lr0           = 1e-3,
+    lr0           = 5e-4,
     lrf           = 0.01,
     weight_decay  = 5e-4,
-    warmup_epochs = 3,
-    hsv_h   = 0.015,
-    hsv_s   = 0.7,
-    hsv_v   = 0.4,
-    degrees = 0.0,
-    translate = 0.1,
-    scale     = 0.5,
-    fliplr    = 0.5,
-    mosaic    = 1.0,
-    mixup     = 0.1,
-    patience    = 15,
+    warmup_epochs = 5,
+    hsv_h    = 0.015,
+    hsv_s    = 0.7,
+    hsv_v    = 0.4,
+    degrees  = 0.0,
+    translate= 0.1,
+    scale    = 0.5,
+    fliplr   = 0.5,
+    mosaic   = 1.0,
+    mixup    = 0.15,
+    copy_paste = 0.1,
+    patience    = 20,
     save        = True,
     save_period = 5,
     val         = True,
@@ -322,21 +396,21 @@ results = model.train(
 )
 
 
-# ── Eval + save ───────────────────────────────────────────────────────────────
+# ── Eval + export ─────────────────────────────────────────────────────────────
+from ultralytics import YOLO
+
 best_pt  = MODEL_OUT / 'yolo12x_bdd_idd' / 'weights' / 'best.pt'
 final_pt = BASE / 'argus_yolo12x_best.pt'
 shutil.copy(best_pt, final_pt)
 print(f'\nSaved: {final_pt}  ({final_pt.stat().st_size/1e6:.1f} MB)')
 
+model = YOLO(str(best_pt))
 metrics = model.val(data=str(yaml_path), imgsz=IMGSZ, verbose=True)
 print(f'\nmAP50:     {metrics.box.map50:.4f}')
 print(f'mAP50-95:  {metrics.box.map:.4f}')
-print(f'Precision: {metrics.box.mp:.4f}')
-print(f'Recall:    {metrics.box.mr:.4f}')
 if hasattr(metrics.box, 'ap_class_index'):
     for i, cls_idx in enumerate(metrics.box.ap_class_index):
         print(f'  {CLASS_NAMES[cls_idx]:12s} AP50={metrics.box.ap50[i]:.3f}')
 
 model.export(format='onnx', imgsz=IMGSZ, simplify=True)
-print('\nONNX exported.')
-print('Done — download argus_yolo12x_best.pt from the Studio file browser.')
+print('ONNX exported. Download argus_yolo12x_best.pt from Studio file browser.')
