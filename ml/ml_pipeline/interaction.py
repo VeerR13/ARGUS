@@ -56,6 +56,14 @@ MIN_CLOSING_SPEED_KMH  = 15.0   # raised from 10; routine fluctuations < 10 km/h
 
 KMH_TO_MS = 1.0 / 3.6
 
+# ── Track age gate ────────────────────────────────────────────────────────────
+# Tracks confirmed for fewer than this many frames are ghost/boot candidates.
+# ByteTrack confirms after 2 frames; a track born from one misdetection can
+# immediately pair and fire.
+# 8 frames ≈ 0.27 s at 30 fps — enough to reject misdetection boots without
+# missing fast accidents (red-light runners, intersection T-bones).
+MIN_TRACK_AGE_FRAMES = 8
+
 # ── F7: absolute speed floor ──────────────────────────────────────────────────
 # At least one vehicle in the pair must exceed this to be flaggable.
 # Uses uncalibrated speed_estimate (km/h), so the value is intentionally
@@ -133,13 +141,14 @@ def _gap_trend_ok(history: deque) -> bool:
 # ── Index builder ─────────────────────────────────────────────────────────────
 
 def _build_frame_index(trajectories: list) -> dict:
-    """frame_num -> list of {vehicle_id, vehicle_class, frame_data}."""
+    """frame_num -> list of {vehicle_id, vehicle_class, first_frame, frame_data}."""
     index: dict = defaultdict(list)
     for traj in trajectories:
         for fd in traj["frames"]:
             index[fd["frame_num"]].append({
                 "vehicle_id":    traj["vehicle_id"],
                 "vehicle_class": traj["vehicle_class"],
+                "first_frame":   traj["first_frame"],
                 "frame_data":    fd,
             })
     return index
@@ -353,6 +362,14 @@ def detect_incidents(
 
                 fd_a = va["frame_data"]
                 fd_b = vb["frame_data"]
+
+                # ── Track age gate: skip ghost / just-born tracks ────────────
+                # Prevents a misdetection-spawned track from immediately pairing
+                # and firing. Both tracks must have been alive long enough.
+                age_a = frame_num - va["first_frame"]
+                age_b = frame_num - vb["first_frame"]
+                if age_a < MIN_TRACK_AGE_FRAMES or age_b < MIN_TRACK_AGE_FRAMES:
+                    continue
 
                 # ── F1: skip both-tiny bboxes ────────────────────────────────
                 area_a = (fd_a["bbox"][2] - fd_a["bbox"][0]) * (fd_a["bbox"][3] - fd_a["bbox"][1])

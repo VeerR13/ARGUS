@@ -20,7 +20,7 @@ class VehicleTracker:
     def __init__(
         self,
         track_activation_threshold: float = 0.25,  # min confidence for primary association
-        lost_track_buffer: int             = 30,    # frames to keep a lost track alive (≈1s @30fps)
+        lost_track_buffer: int             = 60,    # frames to keep a lost track alive (≈2s @30fps)
         minimum_matching_threshold: float  = 0.80,  # IoU gate for track–detection association
         frame_rate: int                    = 30,
         minimum_consecutive_frames: int    = 2,     # frames before a tentative track is confirmed
