@@ -155,9 +155,20 @@ Fine-tuned from `argus_s2.pt` on a 50k proximity-selected hard-example subset.
 
 Final checkpoint: `runs/s25_hmb/argus_s25_hmb/weights/best.pt`
 
-### S3 — Planned
+### S3 — In Progress (KITTI integration, drop UAVDT)
 
-Notebook: `notebooks/argus_s3.ipynb`. Full evaluation on held-out general set + optional distillation to nano model.
+Fine-tuning from `argus_s25_hmb/best.pt`. UAVDT overhead UAV data removed — it contaminated dashcam feature representations. KITTI dashcam dataset added with 3× truck oversample.
+
+| Config | Value |
+|---|---|
+| Base checkpoint | argus_s25_hmb/best.pt |
+| Datasets | BDD100K (~70k) + IDD (~7k) + KITTI (~6.8k train, ×3 truck) |
+| Resolution | 1280px |
+| Epochs | 45 |
+| LR | 5e-5 (fine-tune, not from scratch) |
+| Expected | Truck mAP50 0.138 → 0.45+ |
+
+Notebook: `notebooks/argus_s3.ipynb`
 
 ---
 
@@ -175,8 +186,8 @@ Notebook: `notebooks/argus_s3.ipynb`. Full evaluation on held-out general set + 
 | Week 4 | S2.5 — hard-example mining (POL + HM-A + HM-B) | ✅ Done |
 | Week 4 | Depth-Anything-V2 integration (`depth.py`) | ✅ Done |
 | Week 4 | Trajectory Kalman filter + dual-signal TTC | ✅ Done |
-| Week 5 | S3 — general eval + distillation | ⏳ Planned |
-| Week 5 | Upload page + live backend API | ⏳ Planned |
+| Week 5 | S3 — KITTI integration, drop UAVDT, fix truck mAP50 | 🔄 In Progress |
+| Week 5 | `run_video.py` CLI + depth wired into `analyze_video()` | ✅ Done |
 | Week 5 | Jetson TRT export + latency benchmarking | ⏳ Planned |
 
 ---
@@ -220,11 +231,13 @@ ARGUS/
 │   ├── argus_s2.ipynb         # S2 training — full BDD100K + IDD, fixed remapping
 │   ├── argus_s2_cont.ipynb    # S2 continuation
 │   ├── argus_s2_5.ipynb       # S2.5 — hard-example mining (POL + HM-A + HM-B)
-│   └── argus_s3.ipynb         # S3 — general eval + distillation (planned)
+│   ├── argus_s3.ipynb         # S3 — KITTI integration, drop UAVDT (in progress)
+│   └── argus_final.ipynb      # Eval notebook — UAVDT + VisDrone held-out metrics
 ├── ui/                        # Frontend — deployed to Vercel
 │   ├── index.html
 │   ├── dashboard.html
 │   └── js/
+├── run_video.py               # CLI — analyse any video from the command line
 ├── requirements.txt
 └── README.md
 ```
@@ -235,19 +248,38 @@ ARGUS/
 
 ```bash
 pip install -r requirements.txt
-
-python - <<'EOF'
-from ml.ml_pipeline import analyze_video
-result = analyze_video("path/to/video.mp4")
-print(result["incidents"])
-EOF
 ```
 
-Pretrained YOLO12x weights download automatically on first run. For finetuned weights, place the S2.5 checkpoint in the project root:
+**CLI — analyse a video directly:**
+```bash
+# Pretrained YOLO12x (downloads automatically on first run)
+python run_video.py dashcam.mp4
 
+# S3 finetuned weights (best dashcam/truck accuracy)
+python run_video.py dashcam.mp4 --model argus_s3.pt
+
+# With monocular depth for dual-signal TTC
+python run_video.py dashcam.mp4 --model argus_s3.pt --depth --out report.json
+```
+
+**Python API:**
 ```python
 from ml.ml_pipeline import analyze_video
-result = analyze_video("video.mp4", model_path="argus_s25_best.pt")
+
+# Forward-only (pixel TTC)
+result = analyze_video("dashcam.mp4", model_path="argus_s3.pt")
+
+# With Depth-Anything-V2 dual-signal TTC (+~25 ms/frame on GPU)
+result = analyze_video("dashcam.mp4", model_path="argus_s3.pt", use_depth=True)
+
+print(result["incidents"])
+```
+
+**Individual components:**
+```python
+from ml.ml_pipeline import VehicleDetector, VehicleTracker, TrajectoryBuilder
+from ml.ml_pipeline import detect_incidents
+from ml.ml_pipeline.depth import DepthEstimator  # heavy dep — import on demand
 ```
 
 ---
