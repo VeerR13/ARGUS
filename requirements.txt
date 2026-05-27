@@ -9,6 +9,10 @@ opencv-python>=4.8.0
 transformers>=4.38.0        # Depth-Anything-V2-Small (depth.py)
 huggingface-hub>=0.21.0
 
+# Driver monitoring pipeline
+mediapipe>=0.10.0              # Face Mesh landmarks — gaze, PERCLOS, head pose
+# l2cs                         # Optional: pip install l2cs  (refined gaze, MIT)
+
 # Pipeline utilities
 numpy>=1.24.0
 Pillow>=10.0.0

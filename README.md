@@ -67,14 +67,38 @@ VehicleDetector                         MediaPipe Face Mesh
 | Component | Status | Notes |
 |---|---|---|
 | Forward cam pipeline | ✅ Done | Full ARGUS pipeline — detection → tracking → TTC → incident scoring |
-| Driver cam pipeline | ⏳ Planned | MediaPipe Face Mesh + PERCLOS, ~50 lines of Python, no custom training needed |
+| Driver cam pipeline | ✅ Done | `ml/ml_pipeline/driver_monitor.py` — see stack below |
 | Temporal sync | ⏳ Planned | GPS MP4 metadata → FFT audio cross-correlation → manual fallback |
 | Correlation engine | ⏳ Planned | Match gaze-away windows to forward-cam incident timestamps |
 | Report generation | ⏳ Planned | Claude API converts JSON incidents to causal narrative |
 
-### Why No Custom Training for Driver Cam
+### Driver Cam Model Stack
 
-MediaPipe Face Mesh + PERCLOS covers 80% of the consumer use case (daytime, no sunglasses, forward-facing driver). The novel contribution is the **correlation engine** — matching driver attention failures to forward-cam incident events. No drowsiness model training required for an MVP.
+| Signal | Model | Notes |
+|---|---|---|
+| Gaze deviation | MediaPipe Face Mesh → head-yaw proxy | Fast-path for obvious >25° deviations |
+| Gaze (ambiguous) | L2CS-Net (ResNet-50, Gaze360) | Refines 10–25° cases; MIT license; `pip install l2cs` |
+| Drowsiness | PERCLOS via EAR, 30-frame window | MediaPipe landmarks, no separate model |
+| Yawning | MAR (mouth aspect ratio) | Free from same Face Mesh call |
+| Phone / distraction | YOLOv8n, State Farm fine-tuned | 2.84 MB, 99.46% on distracted-driver classes |
+
+**No custom training required.** All models are pretrained. The novel contribution is the correlation engine — matching driver attention failures to forward-cam incident events.
+
+**Confidence gates (false alert suppression):**
+- No face detected → suppress all outputs
+- EAR permanently <0.15 with no blinks for 5 s → sunglasses detected, suppress drowsiness
+- Head yaw >40° → suppress EAR (geometry breaks at extreme profile)
+- Phone: requires ≥3 consecutive frames + aspect ratio filter (tall/narrow bounding box)
+- Gaze-away: minimum 1.5 s duration before emitting event
+
+```python
+from ml.ml_pipeline.driver_monitor import DriverMonitor, DriverEvent
+
+monitor = DriverMonitor(use_l2cs=True, use_phone_detector=True)
+events  = monitor.process_frame(frame_bgr, timestamp_ms=1000)
+closed  = monitor.flush()   # call at end of video
+# [DriverEvent(start_ts=34000, end_ts=35800, type='gaze_away', confidence=0.78)]
+```
 
 ---
 
@@ -280,7 +304,8 @@ ARGUS/
 │   │   ├── tracking.py        # VehicleTracker — ByteTrack via supervision
 │   │   ├── trajectory.py      # TrajectoryBuilder — 4-state Kalman + depth Kalman
 │   │   ├── depth.py           # DepthEstimator — Depth-Anything-V2-Small
-│   │   └── interaction.py     # InteractionScorer — 9-filter anomaly logic
+│   │   ├── interaction.py     # InteractionScorer — 9-filter anomaly logic
+│   │   └── driver_monitor.py  # DriverMonitor — gaze/drowsiness/phone detection
 │   └── eval_real.py           # Eval against CVAT YOLO annotations
 ├── notebooks/
 │   ├── argus_s2.ipynb         # S2 — full BDD100K + IDD, fixed class remapping
