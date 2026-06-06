@@ -8,9 +8,8 @@ Deploy:
     modal token new            # one-time browser login
     modal deploy modal_app.py  # → prints public URL
 
-Upload model weights (one-time):
-    modal volume create argus-data
-    modal volume put argus-data /path/to/argus_s25.pt argus_s25.pt
+Model weights are auto-downloaded from HF Hub on first run and cached
+in the Modal volume. No manual upload needed.
 
 Set Claude key (optional, for AI narrative):
     modal secret create argus-secrets ANTHROPIC_API_KEY=sk-ant-...
@@ -35,12 +34,13 @@ image = (
         "opencv-python-headless>=4.8.0",
         "numpy>=1.24.0",
         "Pillow>=10.0.0",
+        "huggingface_hub>=0.20.0",
     )
     .add_local_dir("ml", remote_path="/argus/ml")
     .add_local_file("server.py", remote_path="/argus/server.py")
 )
 
-# ── Persistent volume: model weights ──────────────────────────────────────────
+# ── Persistent volume: model weights cache ────────────────────────────────────
 
 volume = modal.Volume.from_name("argus-data", create_if_missing=True)
 
@@ -48,25 +48,31 @@ volume = modal.Volume.from_name("argus-data", create_if_missing=True)
 
 app = modal.App("argus", image=image)
 
+def _resolve_model() -> str:
+    """Download model from HF Hub on first run, cache in volume."""
+    cached = "/data/argus_s25.pt"
+    if os.path.exists(cached):
+        return cached
+    print("Downloading argus_s25.pt from HF Hub…")
+    from huggingface_hub import hf_hub_download
+    path = hf_hub_download(repo_id="VeerR13/argus-weights", filename="argus_s25.pt",
+                           local_dir="/data")
+    volume.commit()   # persist to volume so next cold start skips download
+    return path
+
+
 @app.function(
     gpu="T4",
     volumes={"/data": volume},
-    secrets=[modal.Secret.from_name("argus-secrets", required=False)],
+    secrets=[],  # add modal.Secret.from_name("argus-secrets") after: modal secret create argus-secrets ANTHROPIC_API_KEY=sk-ant-...
     timeout=600,
-    allow_concurrent_inputs=5,
-    scaledown_window=300,   # keep container warm for 5 min between requests
+    scaledown_window=300,
 )
+@modal.concurrent(max_inputs=5)
 @modal.asgi_app()
 def web():
     import sys
     sys.path.insert(0, "/argus")
-
-    # Point server to the model file in the persistent volume
-    model_candidates = ["/data/argus_s25.pt", "/data/argus_yolo12x_best.pt"]
-    for p in model_candidates:
-        if os.path.exists(p):
-            os.environ["ARGUS_MODEL"] = p
-            break
-
+    os.environ["ARGUS_MODEL"] = _resolve_model()
     import server
     return server.app
