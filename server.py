@@ -146,6 +146,22 @@ def _build_metadata(video_path: str, filename: str, video_id: str) -> dict:
     }
 
 
+def _transcode_to_h264(src: Path) -> Path:
+    """Re-encode to H.264 so OpenCV headless can decode AV1/HEVC/VP9 uploads on Linux."""
+    import subprocess
+    out = src.with_suffix(".h264.mp4")
+    r = subprocess.run(
+        ["ffmpeg", "-y", "-i", str(src), "-c:v", "libx264", "-preset", "fast",
+         "-crf", "23", "-an", str(out)],
+        capture_output=True, timeout=300,
+    )
+    if r.returncode != 0:
+        out.unlink(missing_ok=True)
+        return src
+    src.unlink(missing_ok=True)
+    return out
+
+
 def _process_video(video_id: str, video_path: str, filename: str) -> None:
     def _progress(pct: int) -> None:
         with _jobs_lock:
@@ -208,6 +224,8 @@ async def upload_video(file: UploadFile = File(...)):
 
     with open(dest, "wb") as f:
         shutil.copyfileobj(file.file, f)
+
+    dest = _transcode_to_h264(dest)
 
     with _jobs_lock:
         _jobs[video_id] = {
