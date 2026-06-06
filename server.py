@@ -103,6 +103,36 @@ def _build_summary(video_path: str, trajectories: list, incidents: list, proc_se
     avg_speed = round(sum(speeds) / len(speeds), 1) if speeds else 0.0
     max_speed = round(max(speeds), 1) if speeds else 0.0
 
+    # Flow timeline: unique vehicles visible per time bin (10 bins)
+    NUM_BINS = 10
+    flow_sets = [set() for _ in range(NUM_BINS)]
+    if total_frames > 0 and trajectories:
+        for t in trajectories:
+            for f in t.get("frames", []):
+                fn = f.get("frame_num", 0)
+                bi = min(int(fn / total_frames * NUM_BINS), NUM_BINS - 1)
+                flow_sets[bi].add(t["vehicle_id"])
+    flow_timeline = [len(s) for s in flow_sets]
+
+    # Lane utilization: fraction of frame-observations per horizontal third
+    lane_counts = {"lane1": 0, "lane2": 0, "lane3": 0}
+    for t in trajectories:
+        for f in t.get("frames", []):
+            center = f.get("center")
+            cx = center[0] if center else (f["bbox"][0] + f["bbox"][2]) / 2 if f.get("bbox") else w / 2
+            pct = cx / max(w, 1)
+            if pct < 0.333:
+                lane_counts["lane1"] += 1
+            elif pct < 0.667:
+                lane_counts["lane2"] += 1
+            else:
+                lane_counts["lane3"] += 1
+    total_lane = sum(lane_counts.values())
+    lane_utilization = (
+        {k: round(v / total_lane * 100, 1) for k, v in lane_counts.items()}
+        if total_lane > 0 else {"lane1": 33.3, "lane2": 33.3, "lane3": 33.3}
+    )
+
     return {
         "total_vehicles":           total_vehicles,
         "total_incidents":          len(incidents),
@@ -115,6 +145,8 @@ def _build_summary(video_path: str, trajectories: list, incidents: list, proc_se
         "tracking_accuracy":        89.0,
         "classification_precision": 91.0,
         "processing_time_seconds":  round(proc_seconds, 1),
+        "flow_timeline":            flow_timeline,
+        "lane_utilization":         lane_utilization,
         "vehicle_composition": {
             "car":        class_counts.get("car", 0),
             "motorcycle": class_counts.get("motorcycle", 0),
