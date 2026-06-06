@@ -123,32 +123,16 @@ def _build_metadata(video_path: str, filename: str, video_id: str) -> dict:
         "fps": round(fps,2), "resolution": f"{w}x{h}", "total_frames": nf,
     }
 
-def _process_video(video_id: str, video_path: str, filename: str) -> None:
-    def _prog(pct: int):
-        with _jobs_lock:
-            _jobs[video_id]["progress"] = min(pct, 95)
-            _jobs[video_id]["message"]  = (
-                "Initialising…" if pct<10 else
-                "Detecting vehicles…" if pct<30 else
-                "Tracking trajectories…" if pct<60 else
-                "Scoring incidents…" if pct<85 else
-                "Finalising…"
-            )
-    try:
-        t0 = time.time()
-        result = _run_pipeline(video_path)
-        elapsed = time.time() - t0
-        metadata = _build_metadata(video_path, filename, video_id)
-        summary  = _build_summary(video_path, result["trajectories"], result["incidents"], elapsed)
-        full = {
-            "video_id": video_id, "metadata": metadata, "summary": summary,
-            "incidents": result["incidents"], "trajectories": result["trajectories"],
-        }
-        with _jobs_lock:
-            _jobs[video_id].update({"status":"COMPLETE","progress":100,"message":"Done","result":full})
-    except Exception as exc:
-        with _jobs_lock:
-            _jobs[video_id].update({"status":"ERROR","message":str(exc),"error":str(exc)})
+def _finish_job(video_id: str, video_path: str, filename: str, result: dict, elapsed: float) -> dict:
+    metadata = _build_metadata(video_path, filename, video_id)
+    summary  = _build_summary(video_path, result["trajectories"], result["incidents"], elapsed)
+    full = {
+        "video_id": video_id, "metadata": metadata, "summary": summary,
+        "incidents": result["incidents"], "trajectories": result["trajectories"],
+    }
+    with _jobs_lock:
+        _jobs[video_id].update({"status":"COMPLETE","progress":100,"message":"Done","result":full})
+    return full
 
 # ── Endpoints ──────────────────────────────────────────────────────────────────
 
@@ -166,11 +150,25 @@ async def upload_video(file: UploadFile = File(...)):
     if nf / max(fps,1) > MAX_VIDEO_SEC:
         dest.unlink(missing_ok=True)
         raise HTTPException(400, f"Video too long — max {MAX_VIDEO_SEC}s")
+
     with _jobs_lock:
-        _jobs[video_id] = {"status":"QUEUED","progress":0,"message":"Job queued",
+        _jobs[video_id] = {"status":"PROCESSING","progress":10,"message":"Running ML pipeline…",
                            "result":None,"error":None,"filename":file.filename}
-    threading.Thread(target=_process_video, args=(video_id,str(dest),file.filename), daemon=True).start()
-    return {"video_id": video_id, "status": "QUEUED", "message": "Job queued"}
+
+    # Process synchronously so @spaces.GPU runs in the request context (ZeroGPU requirement)
+    try:
+        t0 = time.time()
+        result = _run_pipeline(str(dest))   # blocks ~15-60s on ZeroGPU A10G
+        elapsed = time.time() - t0
+        _finish_job(video_id, str(dest), file.filename, result, elapsed)
+    except Exception as exc:
+        with _jobs_lock:
+            _jobs[video_id].update({"status":"ERROR","message":str(exc),"error":str(exc)})
+        raise HTTPException(500, str(exc))
+    finally:
+        dest.unlink(missing_ok=True)
+
+    return {"video_id": video_id, "status": "COMPLETE", "message": "Done"}
 
 @api.get("/api/jobs/{video_id}/status")
 async def job_status(video_id: str):
