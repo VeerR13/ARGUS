@@ -103,6 +103,29 @@ def _build_summary(video_path: str, trajectories: list, incidents: list, proc_se
     avg_speed = round(sum(speeds) / len(speeds), 1) if speeds else 0.0
     max_speed = round(max(speeds), 1) if speeds else 0.0
 
+    # Speed distribution buckets
+    speed_distribution: dict = {"0-20": 0, "20-40": 0, "40-60": 0, "60-80": 0, "80+": 0}
+    for s in speeds:
+        if s < 20:   speed_distribution["0-20"]  += 1
+        elif s < 40: speed_distribution["20-40"] += 1
+        elif s < 60: speed_distribution["40-60"] += 1
+        elif s < 80: speed_distribution["60-80"] += 1
+        else:        speed_distribution["80+"]   += 1
+
+    # Congestion heatmap: 3 lane rows × 10 time cols
+    NUM_LANE_ROWS = 3
+    NUM_TIME_COLS = 10
+    congestion_heatmap = [[0] * NUM_TIME_COLS for _ in range(NUM_LANE_ROWS)]
+    if total_frames > 0:
+        for t in trajectories:
+            for f in t.get("frames", []):
+                fn  = f.get("frame_num", 0)
+                ti  = min(int(fn / total_frames * NUM_TIME_COLS), NUM_TIME_COLS - 1)
+                cx  = f["center"][0] if f.get("center") else (
+                      (f["bbox"][0] + f["bbox"][2]) / 2 if f.get("bbox") else w / 2)
+                li  = min(int(cx / max(w, 1) * NUM_LANE_ROWS), NUM_LANE_ROWS - 1)
+                congestion_heatmap[li][ti] += 1
+
     # Flow timeline: unique vehicles visible per time bin (10 bins)
     NUM_BINS = 10
     flow_sets = [set() for _ in range(NUM_BINS)]
@@ -147,6 +170,8 @@ def _build_summary(video_path: str, trajectories: list, incidents: list, proc_se
         "processing_time_seconds":  round(proc_seconds, 1),
         "flow_timeline":            flow_timeline,
         "lane_utilization":         lane_utilization,
+        "speed_distribution":       speed_distribution,
+        "congestion_heatmap":       congestion_heatmap,
         "vehicle_composition": {
             "car":        class_counts.get("car", 0),
             "motorcycle": class_counts.get("motorcycle", 0),
