@@ -368,17 +368,54 @@ section{overflow:hidden}
 .access-inner .section-title{font-size:clamp(28px,4vw,48px)}
 .access-inner .section-body{margin:16px auto 0;max-width:40ch;font-size:15px}
 
-.input-row{
-  display:flex;gap:12px;margin-top:40px;
+/* ── upload zone ──────────────────────────────────────────── */
+#upload-zone{margin-top:40px}
+#upload-box{
+  border:1px dashed var(--border-hi);border-radius:4px;
+  padding:48px 32px;cursor:pointer;transition:border-color .2s,background .2s;
+  background:rgba(212,145,90,.03);
 }
-.input-row input{
-  flex:1;height:48px;background:var(--bg3);border:1px solid var(--border);
-  border-radius:2px;padding:0 16px;color:var(--text);font-family:var(--f-body);
-  font-size:14px;outline:none;transition:border-color .2s;
+#upload-box:hover,#upload-box.dragover{
+  border-color:var(--cyan);background:rgba(212,145,90,.07);
 }
-.input-row input:focus{border-color:var(--border-hi)}
-.input-row input::placeholder{color:var(--text2)}
-.input-row .btn-primary{height:48px;white-space:nowrap;flex-shrink:0}
+.upload-icon{margin:0 auto 20px;opacity:.45;width:40px;height:40px}
+.upload-hint{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.5}
+.upload-hint strong{color:var(--text);font-weight:500}
+#select-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:0 28px;height:44px;background:var(--cyan);color:#0C0B09;
+  font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;
+  transition:opacity .2s;
+}
+#select-btn:hover{opacity:.85}
+#select-btn:disabled{opacity:.4;cursor:not-allowed}
+.upload-formats{margin-top:14px;font-size:10px;color:var(--text2);letter-spacing:.08em}
+
+/* ── progress bar ─────────────────────────────────────────── */
+#upload-progress-wrap{
+  margin-top:20px;display:none;
+}
+#upload-progress-wrap.visible{display:block}
+.progress-track{height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-bottom:8px}
+#upload-progress-fill{height:100%;width:0%;background:var(--cyan);transition:width .4s var(--ease)}
+.progress-meta{display:flex;justify-content:space-between;font-size:10px;
+  font-family:var(--f-mono);color:var(--text2);letter-spacing:.06em}
+
+/* ── full-screen loading overlay ─────────────────────────── */
+#loading-overlay{
+  position:fixed;inset:0;z-index:2000;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:32px;opacity:0;pointer-events:none;transition:opacity .4s;
+}
+#loading-overlay.visible{opacity:1;pointer-events:all}
+.loading-label{font-family:var(--f-mono);font-size:10px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--text2)}
+.loading-bar-track{width:280px;height:1px;background:var(--border)}
+#loading-bar-fill{height:100%;width:0%;background:var(--cyan);transition:width .6s var(--ease)}
+#loading-bar-fill.animate{width:92%}
+#loading-status-text{font-family:var(--f-mono);font-size:11px;
+  letter-spacing:.12em;color:var(--cyan);min-height:1.4em}
 
 .access-note{
   font-size:11px;color:var(--text2);letter-spacing:.05em;margin-top:14px;
@@ -431,8 +468,8 @@ footer{
   <div class="nav-links">
     <a href="#overview">Platform</a>
     <a href="#system">System</a>
-    <a href="#access">Access</a>
-    <a href="#access" class="nav-cta">Request Access</a>
+    <a href="#upload">Upload</a>
+    <a href="#upload" class="nav-cta">Try Demo</a>
   </div>
 </nav>
 
@@ -456,7 +493,7 @@ footer{
     <div class="h-div" id="h-div"></div>
     <p class="h-tag" id="h-tag">Detect &nbsp;·&nbsp; Track &nbsp;·&nbsp; Analyze</p>
     <div class="h-cta-wrap" id="h-cta-wrap">
-      <a href="#access" class="btn-primary">Request Access</a>
+      <a href="#upload" class="btn-primary">Analyze Video</a>
       <a href="#overview" class="btn-ghost">Learn More</a>
     </div>
   </div>
@@ -648,22 +685,50 @@ footer{
   </div>
 </section>
 
-<!-- ═══ ACCESS ════════════════════════════════════════════════ -->
-<section class="access-section" id="access">
+<!-- ═══ UPLOAD ═══════════════════════════════════════════════ -->
+<section class="access-section" id="upload">
   <div class="access-inner">
-    <p class="section-label reveal" style="text-align:center">Early Access</p>
-    <h2 class="section-title reveal">Join the<br>ARGUS Program</h2>
+    <p class="section-label reveal" style="text-align:center">Live Analysis</p>
+    <h2 class="section-title reveal">Analyze<br>Your Footage</h2>
     <p class="section-body reveal" style="margin:0 auto">
-      We're onboarding a limited set of city infrastructure teams, research labs,
-      and fleet operators. Leave your email to request access.
+      Upload a dashcam or CCTV clip. ARGUS detects vehicles, tracks trajectories,
+      and flags incidents — results in under 30 seconds.
     </p>
-    <div class="input-row reveal">
-      <input type="email" placeholder="your@institution.edu" id="access-email">
-      <button class="btn-primary" onclick="submitAccess()">Request Access</button>
+
+    <div id="upload-zone" class="reveal">
+      <div id="upload-box">
+        <svg class="upload-icon" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="4" width="32" height="32" rx="3"/>
+          <polyline points="14,18 20,12 26,18"/>
+          <line x1="20" y1="12" x2="20" y2="28"/>
+        </svg>
+        <p class="upload-hint">
+          <strong>Drop a video here</strong><br>or click to browse
+        </p>
+        <button id="select-btn">— Select File for Analysis —</button>
+        <p class="upload-formats">MP4 · MOV · AVI · WEBM &nbsp;·&nbsp; max 3 min</p>
+      </div>
+
+      <div id="upload-progress-wrap">
+        <div class="progress-track"><div id="upload-progress-fill"></div></div>
+        <div class="progress-meta">
+          <span id="upload-progress-status">Uploading…</span>
+          <span id="upload-progress-pct">0%</span>
+        </div>
+      </div>
     </div>
-    <p class="access-note reveal">No spam. Deployment timeline communicated directly.</p>
+
+    <p class="access-note reveal">Powered by YOLO12x · T4 GPU · Results stay in your browser</p>
+    <input type="file" id="file-input" accept="video/*" style="display:none">
   </div>
 </section>
+
+<!-- ═══ LOADING OVERLAY ══════════════════════════════════════ -->
+<div id="loading-overlay">
+  <p class="loading-label">ARGUS · Processing</p>
+  <div class="loading-bar-track"><div id="loading-bar-fill"></div></div>
+  <p id="loading-status-text">Initializing neural pipeline…</p>
+</div>
 
 <!-- ═══ FOOTER ═══════════════════════════════════════════════ -->
 <footer>
@@ -796,15 +861,7 @@ setTimeout(function(){
 }, 2800);
 window.addEventListener('scroll', _enableSound, {once:true, passive:true});
 
-/* ── Access form ─────────────────────────────────────────── */
-function submitAccess(){
-  var email = document.getElementById('access-email').value;
-  if(!email || !email.includes('@')) return;
-  var btn = document.querySelector('.input-row .btn-primary');
-  btn.textContent = 'Submitted ✓';
-  btn.style.background = 'var(--green)';
-  btn.disabled = true;
-}
 </script>
+<script type="module" src="js/landing.js"></script>
 </body>
 </html>
