@@ -136,6 +136,22 @@ def _finish_job(video_id: str, video_path: str, filename: str, result: dict, ela
 
 # ── Endpoints ──────────────────────────────────────────────────────────────────
 
+def _transcode_to_h264(src: Path) -> Path:
+    """Transcode video to H.264 so OpenCV headless can decode any input codec (AV1, HEVC, VP9…)."""
+    import subprocess
+    out = src.with_suffix(".h264.mp4")
+    r = subprocess.run(
+        ["ffmpeg", "-y", "-i", str(src), "-c:v", "libx264", "-preset", "fast",
+         "-crf", "23", "-an", str(out)],
+        capture_output=True, timeout=300,
+    )
+    if r.returncode != 0:
+        out.unlink(missing_ok=True)
+        return src   # fall back to original; let OpenCV try
+    src.unlink(missing_ok=True)
+    return out
+
+
 @api.post("/api/upload")
 async def upload_video(file: UploadFile = File(...)):
     if not _model_ok:
@@ -144,6 +160,10 @@ async def upload_video(file: UploadFile = File(...)):
     dest = UPLOAD_DIR / f"{video_id}{Path(file.filename).suffix or '.mp4'}"
     with open(dest, "wb") as f:
         shutil.copyfileobj(file.file, f)
+
+    # Transcode to H.264 so OpenCV headless can decode any codec (AV1, HEVC, VP9…)
+    dest = _transcode_to_h264(dest)
+
     cap = cv2.VideoCapture(str(dest))
     fps, nf = cap.get(cv2.CAP_PROP_FPS) or 30.0, int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     cap.release()
