@@ -4,7 +4,8 @@
 // Each function marked // MOCK or // REAL
 // ═══════════════════════════════════════════════════════════
 
-const API_BASE = 'http://localhost:8000';
+// Override via browser console: localStorage.setItem('argus_api_base', 'https://xxxx.ngrok.io')
+const API_BASE = localStorage.getItem('argus_api_base') || 'http://localhost:8000';
 
 const LOADING_MESSAGES = [
   'Initializing neural pipeline…',
@@ -49,16 +50,12 @@ export function loadMockData() {
 export async function uploadVideo(file) {
   log('uploadVideo', `file="${file.name}" size=${file.size}`);
 
-  // // MOCK
-  await sleep(400);
-  return { video_id: 'demo_001', status: 'QUEUED', message: 'Job queued' };
-
-  // // REAL (uncomment when backend is live):
-  // const form = new FormData();
-  // form.append('file', file);
-  // const res = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: form });
-  // if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
-  // return res.json();
+  // // REAL
+  const form = new FormData();
+  form.append('file', file);
+  const res = await fetch(`${API_BASE}/api/upload`, { method: 'POST', body: form });
+  if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+  return res.json();
 }
 
 // ── Job status polling ──────────────────────────────────────
@@ -75,58 +72,28 @@ export async function uploadVideo(file) {
  *          Polls GET /api/jobs/{videoId}/status when backend is live.
  */
 export async function pollJobStatus(videoId, onProgress, onComplete, onError) {
-  log('pollJobStatus', `videoId=${videoId} [MOCK]`);
+  log('pollJobStatus', `videoId=${videoId}`);
 
-  // // MOCK — simulate 5-second ramp from 0→100
-  const TOTAL_MS   = 5000;
-  const INTERVAL   = 300;
-  const STEPS      = Math.ceil(TOTAL_MS / INTERVAL);
-  let   step       = 0;
-  let   msgIndex   = 0;
-
-  const ticker = setInterval(async () => {
-    step++;
-    const pct = Math.min(Math.round((step / STEPS) * 100), 100);
-    const msg = LOADING_MESSAGES[msgIndex % LOADING_MESSAGES.length];
-    msgIndex++;
-
-    log('pollJobStatus', `progress=${pct}% "${msg}"`);
-    onProgress(pct, msg);
-
-    if (pct >= 100) {
-      clearInterval(ticker);
-      try {
-        const data = await loadMockData();
-        // Patch filename from localStorage if available
-        const fname = localStorage.getItem('tl_filename');
-        if (fname && data.metadata) data.metadata.filename = fname;
+  // // REAL
+  const POLL_INTERVAL = 3000;
+  const poll = async () => {
+    try {
+      log('pollJobStatus', `GET /api/jobs/${videoId}/status`);
+      const res = await fetch(`${API_BASE}/api/jobs/${videoId}/status`);
+      if (!res.ok) throw new Error(`Status poll failed: ${res.status}`);
+      const { status, progress, message } = await res.json();
+      onProgress(progress, message);
+      if (status === 'COMPLETE') {
+        const data = await getAnalysis(videoId);
         onComplete(data);
-      } catch (err) {
-        onError(err);
+      } else if (status === 'ERROR') {
+        throw new Error(message || 'Processing failed');
+      } else {
+        setTimeout(poll, POLL_INTERVAL);
       }
-    }
-  }, INTERVAL);
-
-  // // REAL (replace the above block with this when backend is live):
-  // const POLL_INTERVAL = 3000;
-  // const poll = async () => {
-  //   try {
-  //     log('pollJobStatus', `GET /api/jobs/${videoId}/status`);
-  //     const res = await fetch(`${API_BASE}/api/jobs/${videoId}/status`);
-  //     if (!res.ok) throw new Error(`Status poll failed: ${res.status}`);
-  //     const { status, progress, message } = await res.json();
-  //     onProgress(progress, message);
-  //     if (status === 'COMPLETE') {
-  //       const data = await getAnalysis(videoId);
-  //       onComplete(data);
-  //     } else if (status === 'ERROR') {
-  //       throw new Error(message || 'Processing failed');
-  //     } else {
-  //       setTimeout(poll, POLL_INTERVAL);
-  //     }
-  //   } catch (err) { onError(err); }
-  // };
-  // poll();
+    } catch (err) { onError(err); }
+  };
+  poll();
 }
 
 // ── Analysis ────────────────────────────────────────────────
@@ -136,14 +103,12 @@ export async function pollJobStatus(videoId, onProgress, onComplete, onError) {
  * // MOCK: returns mock_analysis.json
  */
 export async function getAnalysis(videoId) {
-  log('getAnalysis', `videoId=${videoId} [MOCK]`);
-  // // MOCK
-  return loadMockData();
-
-  // // REAL:
-  // const res = await fetch(`${API_BASE}/api/videos/${videoId}/analysis`);
-  // if (!res.ok) throw new Error(`Analysis fetch failed: ${res.status}`);
-  // return res.json();
+  log('getAnalysis', `videoId=${videoId}`);
+  if (videoId === 'demo_001') return loadMockData();
+  // // REAL
+  const res = await fetch(`${API_BASE}/api/videos/${videoId}/analysis`);
+  if (!res.ok) throw new Error(`Analysis fetch failed: ${res.status}`);
+  return res.json();
 }
 
 /**
@@ -151,16 +116,14 @@ export async function getAnalysis(videoId) {
  * // MOCK: finds in mock data.
  */
 export async function getIncident(incidentId) {
-  log('getIncident', `id=${incidentId} [MOCK]`);
-  const data = await loadMockData();
-  const incident = data.incidents.find(i => i.id === incidentId);
-  if (!incident) throw new Error(`Incident ${incidentId} not found`);
-  return { incident, metadata: data.metadata, summary: data.summary, trajectories: data.trajectories || [] };
-
-  // // REAL:
-  // const res = await fetch(`${API_BASE}/api/incidents/${incidentId}`);
-  // if (!res.ok) throw new Error(`Incident fetch failed: ${res.status}`);
-  // return res.json();
+  log('getIncident', `id=${incidentId}`);
+  // Check if this incident is in the mock data (demo mode)
+  const mockInc = MOCK_DATA.incidents.find(i => i.id === incidentId);
+  if (mockInc) return { incident: mockInc, metadata: MOCK_DATA.metadata, summary: MOCK_DATA.summary, trajectories: MOCK_DATA.trajectories || [] };
+  // // REAL
+  const res = await fetch(`${API_BASE}/api/incidents/${incidentId}`);
+  if (!res.ok) throw new Error(`Incident fetch failed: ${res.status}`);
+  return res.json();
 }
 
 // ── Claude streaming ─────────────────────────────────────────
