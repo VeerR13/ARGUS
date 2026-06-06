@@ -5,7 +5,7 @@
 // ═══════════════════════════════════════════════════════════
 
 // Override via browser console: localStorage.setItem('argus_api_base', 'https://xxxx.ngrok.io')
-const API_BASE = localStorage.getItem('argus_api_base') || 'http://localhost:8000';
+const API_BASE = localStorage.getItem('argus_api_base') || 'https://veer13-argus-api.hf.space';
 
 const LOADING_MESSAGES = [
   'Initializing neural pipeline…',
