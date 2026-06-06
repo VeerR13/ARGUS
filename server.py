@@ -47,10 +47,35 @@ ANTHROPIC_KEY   = os.environ.get("ANTHROPIC_API_KEY", "")
 UPLOAD_DIR      = Path(tempfile.gettempdir()) / "argus_uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-# ── In-memory job store ───────────────────────────────────────────────────────
-# { video_id: { status, progress, message, result, error, filename } }
+# ── Job store (in-memory + Volume persistence) ────────────────────────────────
+# In-memory for fast progress polling; Volume for cross-container result access.
 _jobs: dict[str, dict] = {}
 _jobs_lock = threading.Lock()
+
+# Volume job directory — /data is the Modal Volume mount (or /tmp locally)
+_JOB_DIR = Path(os.environ.get("ARGUS_JOB_DIR", "/data/jobs"))
+_JOB_DIR.mkdir(parents=True, exist_ok=True)
+
+def _job_path(video_id: str) -> Path:
+    return _JOB_DIR / f"{video_id}.json"
+
+def _persist_job(video_id: str, job: dict) -> None:
+    """Write completed job result to Volume so any container can read it."""
+    try:
+        data = {k: v for k, v in job.items() if k != "error"}
+        _job_path(video_id).write_text(json.dumps(data))
+    except Exception as e:
+        print(f"WARNING: could not persist job {video_id}: {e}")
+
+def _load_job(video_id: str) -> dict | None:
+    """Load job from Volume if not in memory (cross-container access)."""
+    p = _job_path(video_id)
+    if not p.exists():
+        return None
+    try:
+        return json.loads(p.read_text())
+    except Exception:
+        return None
 
 # ── Pre-load model (once at startup) ─────────────────────────────────────────
 
@@ -259,6 +284,7 @@ def _process_video(video_id: str, video_path: str, filename: str) -> None:
             _jobs[video_id]["progress"] = 100
             _jobs[video_id]["message"]  = "Done"
             _jobs[video_id]["result"]   = full
+        _persist_job(video_id, _jobs[video_id])
 
     except Exception as exc:
         with _jobs_lock:
@@ -310,6 +336,8 @@ async def job_status(video_id: str):
     with _jobs_lock:
         job = _jobs.get(video_id)
     if job is None:
+        job = _load_job(video_id)  # cross-container fallback
+    if job is None:
         raise HTTPException(404, f"Job {video_id} not found")
     resp = {
         "video_id": video_id,
@@ -326,6 +354,8 @@ async def job_status(video_id: str):
 async def get_analysis(video_id: str):
     with _jobs_lock:
         job = _jobs.get(video_id)
+    if job is None:
+        job = _load_job(video_id)  # cross-container fallback
     if job is None:
         raise HTTPException(404, f"Video {video_id} not found")
     if job["status"] != "COMPLETE":
