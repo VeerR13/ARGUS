@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+venv/
+env/
+.env
+*.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ML artifacts & weights
+*.pt
+*.pth
+*.onnx
+runs/
+
+# Model outputs (generated files)
+output_*/
+output_*.json
+output_*.mp4
+output_*.avi
+
+# IDE / Claude
+.claude/
+.idea/
+.vscode/
+
+# macOS
+.DS_Store
+
+# Dataset images (large — add via DVC or link in README)
+dataset/train/
+dataset/val/
+dataset/test/
