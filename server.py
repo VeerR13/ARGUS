@@ -37,7 +37,8 @@ import cv2
 import uvicorn
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
+from starlette.requests import Request
 from pydantic import BaseModel
 
 # ── Config ────────────────────────────────────────────────────────────────────
@@ -46,6 +47,8 @@ MODEL_PATH      = os.environ.get("ARGUS_MODEL", "yolo12x.pt")
 ANTHROPIC_KEY   = os.environ.get("ANTHROPIC_API_KEY", "")
 UPLOAD_DIR      = Path(tempfile.gettempdir()) / "argus_uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+VIDEOS_DIR      = Path("/data/videos") if Path("/data").exists() else Path(tempfile.gettempdir()) / "argus_videos"
+VIDEOS_DIR.mkdir(parents=True, exist_ok=True)
 
 # ── Job store (in-memory + Volume persistence) ────────────────────────────────
 # In-memory for fast progress polling; Volume for cross-container result access.
@@ -310,6 +313,10 @@ async def upload_video(file: UploadFile = File(...)):
 
     dest = _transcode_to_h264(dest)
 
+    # Persist video to Volume so stream endpoint works from any container
+    stored = VIDEOS_DIR / f"{video_id}.mp4"
+    shutil.copy2(str(dest), str(stored))
+
     with _jobs_lock:
         _jobs[video_id] = {
             "status":   "QUEUED",
@@ -361,6 +368,18 @@ async def get_analysis(video_id: str):
     if job["status"] != "COMPLETE":
         raise HTTPException(202, f"Processing not complete: {job['status']}")
     return job["result"]
+
+
+@app.get("/api/videos/{video_id}/stream")
+async def stream_video(video_id: str):
+    path = VIDEOS_DIR / f"{video_id}.mp4"
+    if not path.exists():
+        raise HTTPException(404, "Video not found or expired")
+    return FileResponse(
+        path=str(path),
+        media_type="video/mp4",
+        headers={"Accept-Ranges": "bytes"},
+    )
 
 
 @app.get("/api/incidents/{incident_id}")

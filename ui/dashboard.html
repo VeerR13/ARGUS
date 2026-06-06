@@ -1,783 +1,730 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ARGUS — Analysis Dashboard</title>
-  <link rel="stylesheet" href="css/main.css" />
-  <style>
-    body { overflow-x: hidden; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ARGUS — Traffic Analysis Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── design tokens (match landing page exactly) ─────────── */
+:root {
+  --bg:        #0C0B09;
+  --bg2:       #141310;
+  --bg3:       #1E1C18;
+  --cyan:      #D4915A;
+  --green:     #A8C5A0;
+  --text:      #EDE5D8;
+  --text2:     #6B5E4E;
+  --border:    rgba(212,145,90,.10);
+  --border-hi: rgba(212,145,90,.28);
+  --f-display: 'Bebas Neue', sans-serif;
+  --f-head:    'DM Serif Display', Georgia, serif;
+  --f-body:    'Inter', sans-serif;
+  --f-mono:    'JetBrains Mono', monospace;
+  --ease:      cubic-bezier(.16,1,.3,1);
 
-    /* ── Layout ─────────────────────────────────────────── */
-    .dashboard-body {
-      max-width: 1360px;
-      margin: 0 auto;
-      padding: 32px 28px 80px;
-    }
+  /* severity palette */
+  --sev-high:   #C4615A;
+  --sev-medium: #D4915A;
+  --sev-low:    #A8C5A0;
+}
 
-    /* ── Report header ──────────────────────────────────── */
-    .report-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 20px;
-    }
+/* ── reset ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; color-scheme: dark; background: #0C0B09; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+a { color: inherit; text-decoration: none; }
 
-    .report-header-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: 30px;
-      letter-spacing: 3px;
-      color: #fff;
-      margin-top: 6px;
-    }
+/* ── noise grain overlay (matches landing) ───────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity: .4;
+  mix-blend-mode: overlay;
+}
 
-    .report-header-chips {
-      display: flex;
-      gap: 8px;
-    }
+/* ── sticky nav ──────────────────────────────────────────── */
+#nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 56px;
+  background: rgba(12,11,9,.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
 
-    .meta-chip {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 7px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.35);
-      border: 1px solid var(--border);
-      padding: 4px 10px;
-    }
+#nav-logo {
+  font-family: var(--f-display);
+  font-size: 22px;
+  letter-spacing: 4px;
+  color: var(--text);
+  flex-shrink: 0;
+}
+#nav-logo span { color: var(--cyan); }
 
-    /* ── File info bar ──────────────────────────────────── */
-    .file-info-bar {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 12px 18px;
-      margin-bottom: 24px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-left: 2px solid var(--accent);
-    }
+#nav-center {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--text2);
+}
 
-    .file-info-icon {
-      color: rgba(74,158,255,0.5);
-      flex-shrink: 0;
-    }
+.nav-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 0 rgba(168,197,160,.5);
+  animation: pulse-ring 2s ease-out infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0   rgba(168,197,160,.5); }
+  70%  { box-shadow: 0 0 0 6px rgba(168,197,160,0);  }
+  100% { box-shadow: 0 0 0 0   rgba(168,197,160,0);  }
+}
 
-    .file-info-name {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 2px;
-      color: rgba(255,255,255,0.6);
-      flex: 1;
-    }
+#nav-status-text { color: var(--green); font-size: 11px; }
+#nav-sep { color: var(--border-hi); }
+#nav-filename { color: var(--text2); max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    .file-info-meta {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 7px;
-      letter-spacing: 2px;
-      color: rgba(255,255,255,0.25);
-      text-transform: uppercase;
-      display: flex;
-      gap: 16px;
-    }
+#nav-right { flex-shrink: 0; }
 
-    /* ── Stats grid ─────────────────────────────────────── */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 2px;
-      margin-bottom: 24px;
-    }
+.btn-back {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: .06em;
+  color: var(--text2);
+  border: 1px solid var(--border);
+  padding: 7px 16px;
+  background: transparent;
+  cursor: pointer;
+  transition: color .2s var(--ease), border-color .2s var(--ease);
+  display: inline-block;
+}
+.btn-back:hover {
+  color: var(--text);
+  border-color: var(--border-hi);
+}
 
-    /* ── Persona switcher ───────────────────────────────── */
-    .persona-tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 2px;
-    }
+/* ── page wrapper ────────────────────────────────────────── */
+#page {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 52px 32px 100px;
+}
 
-    .persona-tab {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 8px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.3);
-      padding: 12px 20px;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      transition: color 0.2s, border-color 0.2s, background 0.2s;
-    }
+/* ── page header ─────────────────────────────────────────── */
+#page-header {
+  margin-bottom: 44px;
+}
 
-    .persona-tab:hover { color: rgba(255,255,255,0.6); }
+.page-label {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  display: block;
+  margin-bottom: 10px;
+}
 
-    .persona-tab.active {
-      color: rgba(255,255,255,0.9);
-      border-bottom-color: var(--accent);
-      background: rgba(74,158,255,0.08);
-    }
+.page-title {
+  font-family: var(--f-head);
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.05;
+  letter-spacing: -.01em;
+  margin-bottom: 32px;
+}
 
-    /* ── Chart sections ─────────────────────────────────── */
-    .chart-section {
-      margin-bottom: 2px;
-    }
+/* ── 4-col stats bar ─────────────────────────────────────── */
+#stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--border);
+}
 
-    .chart-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      padding: 20px;
-    }
+.stat-cell {
+  padding: 20px 24px;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+.stat-cell:last-child { border-right: none; }
 
-    canvas.chart-canvas {
-      display: block;
-      width: 100%;
-    }
+.stat-cell-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text2);
+  display: block;
+  margin-bottom: 8px;
+}
 
-    /* Flow chart full width */
-    #flow-chart { height: 150px; }
+.stat-cell-value {
+  font-family: var(--f-head);
+  font-size: 34px;
+  color: var(--text);
+  line-height: 1;
+  display: block;
+}
 
-    /* Row 2: 3 columns */
-    .chart-row-2 {
-      display: grid;
-      grid-template-columns: 2fr 1.4fr 1.4fr;
-      gap: 2px;
-      margin-bottom: 2px;
-    }
+.stat-cell-unit {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  color: var(--text2);
+  margin-top: 4px;
+  display: block;
+}
 
-    #speed-chart    { height: 190px; }
-    #donut-chart    { height: 190px; }
-    #lane-chart     { height: 190px; }
+/* amber accent line on stat cells */
+.stat-cell::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--cyan) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity .3s;
+}
+.stat-cell:hover::after { opacity: 1; }
 
-    /* Row 3: 2 columns */
-    .chart-row-3 {
-      display: grid;
-      grid-template-columns: 3fr 2fr;
-      gap: 2px;
-      margin-bottom: 24px;
-    }
+/* ── main 2-col layout ───────────────────────────────────── */
+#main-cols {
+  display: grid;
+  grid-template-columns: 60fr 40fr;
+  gap: 2px;
+  margin-top: 2px;
+}
 
-    #heatmap-chart  { height: 160px; }
+/* ── section headings ────────────────────────────────────── */
+.section-head {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text2);
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-head-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--cyan);
+  flex-shrink: 0;
+}
 
-    /* Anomaly log */
-    .anomaly-log {
-      max-height: 220px;
-      overflow-y: auto;
-    }
+/* ── panel shell ─────────────────────────────────────────── */
+.panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+}
 
-    .anomaly-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 9px 0;
-      border-bottom: 1px solid rgba(74,158,255,0.06);
-      cursor: pointer;
-      transition: background 0.15s;
-    }
+/* ── LEFT col: incident log ──────────────────────────────── */
+#col-left { display: flex; flex-direction: column; }
 
-    .anomaly-row:hover { background: rgba(74,158,255,0.04); margin: 0 -8px; padding: 9px 8px; }
-    .anomaly-row:last-child { border-bottom: none; }
+#anomaly-log {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+#anomaly-log::-webkit-scrollbar { width: 4px; }
+#anomaly-log::-webkit-scrollbar-track { background: transparent; }
+#anomaly-log::-webkit-scrollbar-thumb { background: var(--border-hi); }
 
-    .anomaly-ts {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 7px;
-      letter-spacing: 1px;
-      color: var(--accent);
-      flex-shrink: 0;
-      margin-top: 1px;
-      white-space: nowrap;
-    }
+.incident-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .18s var(--ease);
+  border-left: 3px solid transparent;
+  position: relative;
+}
+.incident-row:last-child { border-bottom: none; }
+.incident-row:hover { background: rgba(212,145,90,.04); }
 
-    .anomaly-desc {
-      font-family: 'Barlow', sans-serif;
-      font-weight: 300;
-      font-size: 11px;
-      color: rgba(255,255,255,0.5);
-      line-height: 1.5;
-      flex: 1;
-    }
+.incident-ts {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--cyan);
+  flex-shrink: 0;
+  margin-top: 1px;
+  min-width: 44px;
+  letter-spacing: .04em;
+}
 
-    /* ── Confidence bars ────────────────────────────────── */
-    .confidence-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2px;
-      margin-bottom: 24px;
-    }
+.incident-body { flex: 1; min-width: 0; }
 
-    .conf-bar-bg {
-      height: 2px;
-      background: rgba(255,255,255,0.06);
-      margin-top: 10px;
-      position: relative;
-      overflow: hidden;
-    }
+.incident-type-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
 
-    .conf-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--accent), var(--cyan));
-      transition: width 1.2s ease;
-    }
+.incident-type-label {
+  font-family: var(--f-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+}
 
-    .conf-value {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: 36px;
-      color: #fff;
-      line-height: 1;
-    }
+.sev-badge {
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border: 1px solid;
+  flex-shrink: 0;
+}
+.sev-badge.high   { color: var(--sev-high);   border-color: rgba(196,97,90,.35);  background: rgba(196,97,90,.08); }
+.sev-badge.medium { color: var(--sev-medium);  border-color: rgba(212,145,90,.35); background: rgba(212,145,90,.06); }
+.sev-badge.low    { color: var(--sev-low);     border-color: rgba(168,197,160,.3); background: rgba(168,197,160,.06); }
 
-    /* ── AI Analysis panel ──────────────────────────────── */
-    .ai-panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      margin-bottom: 24px;
-    }
+.incident-vehicles {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--text2);
+  letter-spacing: .03em;
+}
 
-    .ai-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 18px 22px;
-      border-bottom: 1px solid var(--border);
-    }
+.incident-play-hint {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .1em;
+  color: var(--text2);
+  opacity: 0;
+  transition: opacity .18s var(--ease);
+  flex-shrink: 0;
+  margin-top: 2px;
+  user-select: none;
+}
+.incident-row:hover .incident-play-hint { opacity: 1; color: var(--cyan); }
 
-    .ai-icon {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 2px;
-      color: var(--accent);
-      border: 1px solid rgba(74,158,255,0.35);
-      padding: 3px 7px;
-      margin-right: 12px;
-      flex-shrink: 0;
-    }
+/* no-incidents state */
+.no-incidents {
+  padding: 48px 20px;
+  text-align: center;
+}
+.no-incidents-icon {
+  font-family: var(--f-mono);
+  font-size: 28px;
+  color: var(--border-hi);
+  display: block;
+  margin-bottom: 14px;
+}
+.no-incidents-text {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
 
-    .ai-panel-label {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 7px;
-      letter-spacing: 4px;
-      color: rgba(255,255,255,0.3);
-      text-transform: uppercase;
-      display: block;
-      margin-bottom: 4px;
-    }
+/* ── RIGHT col ───────────────────────────────────────────── */
+#col-right { display: flex; flex-direction: column; gap: 2px; }
 
-    .ai-panel-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: 20px;
-      letter-spacing: 2px;
-      color: #fff;
-    }
+/* flow chart */
+#flow-panel { background: var(--bg2); border: 1px solid var(--border); }
+#flow-chart-wrap { padding: 16px 20px 20px; }
+#flow-chart { display: block; width: 100%; height: 140px; }
 
-    .ai-panel-chips {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
+/* donut */
+#donut-panel { background: var(--bg2); border: 1px solid var(--border); }
+#donut-chart-wrap { padding: 16px 20px 20px; display: flex; flex-direction: column; align-items: center; }
+#donut-chart { display: block; width: 100%; height: 180px; }
+#donut-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 12px;
+  justify-content: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .08em;
+  color: var(--text2);
+  text-transform: capitalize;
+}
+.legend-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
 
-    .ai-panel-body {
-      display: grid;
-      grid-template-columns: 60% 40%;
-      gap: 0;
-      padding: 0;
-    }
+/* confidence bars */
+#conf-panel { background: var(--bg2); border: 1px solid var(--border); }
+#conf-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 18px; }
 
-    .ai-text-col {
-      padding: 22px;
-      border-right: 1px solid var(--border);
-    }
+.conf-row {}
+.conf-row-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 7px;
+}
+.conf-row-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+.conf-row-value {
+  font-family: var(--f-mono);
+  font-size: 13px;
+  color: var(--cyan);
+  letter-spacing: .04em;
+}
+.conf-bar-bg {
+  height: 2px;
+  background: rgba(212,145,90,.08);
+  position: relative;
+  overflow: hidden;
+}
+.conf-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--cyan) 0%, rgba(212,145,90,.4) 100%);
+  transition: width 1s var(--ease);
+}
 
-    .ai-text-area {
-      min-height: 120px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 1px;
-      color: rgba(255,255,255,0.25);
-      font-style: italic;
-      line-height: 1.7;
-    }
+/* ── video modal overlay ─────────────────────────────────── */
+#video-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(12,11,9,.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .28s var(--ease);
+}
+#video-modal.open {
+  opacity: 1;
+  pointer-events: all;
+}
 
-    .ai-text-area.streaming {
-      font-family: 'Barlow', sans-serif;
-      font-weight: 300;
-      font-size: 13px;
-      letter-spacing: 0;
-      color: rgba(255,255,255,0.6);
-      line-height: 1.95;
-      font-style: normal;
-    }
+#modal-inner {
+  background: var(--bg2);
+  border: 1px solid var(--border-hi);
+  width: min(860px, 94vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transform: translateY(12px);
+  transition: transform .3s var(--ease);
+}
+#video-modal.open #modal-inner { transform: translateY(0); }
 
-    .ai-meta-col {
-      padding: 22px;
-    }
+#modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+#modal-header-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+#modal-close {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  width: 28px; height: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  transition: color .18s, border-color .18s;
+  flex-shrink: 0;
+}
+#modal-close:hover { color: var(--text); border-color: var(--border-hi); }
 
-    .ai-metrics-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-    }
+#modal-video-wrap {
+  background: #000;
+  flex-shrink: 0;
+  position: relative;
+}
+#modal-video {
+  display: block;
+  width: 100%;
+  max-height: 460px;
+  object-fit: contain;
+}
 
-    .ai-metrics-table td {
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(74,158,255,0.06);
-      font-family: 'Barlow', sans-serif;
-      font-weight: 300;
-      font-size: 11px;
-    }
+#modal-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.modal-metric-cell {
+  padding: 14px 18px;
+  border-right: 1px solid var(--border);
+}
+.modal-metric-cell:last-child { border-right: none; }
+.modal-metric-label {
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text2);
+  display: block;
+  margin-bottom: 6px;
+}
+.modal-metric-value {
+  font-family: var(--f-head);
+  font-size: 20px;
+  color: var(--text);
+  display: block;
+  line-height: 1.1;
+}
 
-    .ai-metrics-table td:first-child {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 7px;
-      letter-spacing: 2px;
-      color: rgba(255,255,255,0.25);
-      text-transform: uppercase;
-    }
+/* ── responsive ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  #main-cols { grid-template-columns: 1fr; }
+  #stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .stat-cell:nth-child(2) { border-right: none; }
+  .stat-cell:nth-child(1),
+  .stat-cell:nth-child(2) { border-bottom: 1px solid var(--border); }
+  #modal-metrics { grid-template-columns: repeat(2, 1fr); }
+  .modal-metric-cell:nth-child(2) { border-right: none; }
+  .modal-metric-cell:nth-child(1),
+  .modal-metric-cell:nth-child(2) { border-bottom: 1px solid var(--border); }
+  #page { padding: 32px 16px 80px; }
+  #nav { padding: 0 16px; }
+  #nav-center { display: none; }
+}
 
-    .ai-metrics-table td:last-child {
-      text-align: right;
-      color: rgba(255,255,255,0.6);
-    }
+@media (max-width: 480px) {
+  #stats-bar { grid-template-columns: 1fr; }
+  .stat-cell { border-right: none; border-bottom: 1px solid var(--border); }
+  .stat-cell:last-child { border-bottom: none; }
+}
 
-    .ai-rec-item {
-      font-family: 'Barlow', sans-serif;
-      font-weight: 300;
-      font-size: 11px;
-      color: rgba(255,255,255,0.45);
-      padding: 5px 0;
-      padding-left: 16px;
-      position: relative;
-      line-height: 1.5;
-    }
-
-    .ai-rec-item::before {
-      content: '→';
-      position: absolute;
-      left: 0;
-      color: var(--accent);
-      font-size: 10px;
-    }
-
-    .ai-panel-footer {
-      padding: 16px 22px;
-      border-top: 1px solid var(--border);
-    }
-
-    .btn-generate {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      background: rgba(74,158,255,0.08);
-      border: 1px solid rgba(74,158,255,0.35);
-      color: #4a9eff;
-      padding: 12px;
-      width: 100%;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-generate:hover { background: rgba(74,158,255,0.15); }
-
-    .btn-generate:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    /* ── Finding cards ──────────────────────────────────── */
-    .finding-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2px;
-      margin-bottom: 24px;
-    }
-
-    .finding-number {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 7px;
-      letter-spacing: 3px;
-      color: rgba(74,158,255,0.4);
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    .finding-value {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: 38px;
-      color: #fff;
-      line-height: 1;
-      display: block;
-      margin-bottom: 6px;
-    }
-
-    .finding-label {
-      font-family: 'Barlow', sans-serif;
-      font-weight: 300;
-      font-size: 11px;
-      color: rgba(255,255,255,0.4);
-      line-height: 1.5;
-    }
-
-    /* ── Dashboard footer ───────────────────────────────── */
-    .dashboard-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 20px;
-      border-top: 1px solid rgba(74,158,255,0.08);
-      margin-top: 40px;
-    }
-
-    .dashboard-footer-left {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 7px;
-      letter-spacing: 2px;
-      color: rgba(255,255,255,0.2);
-      text-transform: uppercase;
-    }
-
-    .dashboard-footer-right {
-      display: flex;
-      gap: 8px;
-    }
-
-    /* ── Cursor blink for typewriter ────────────────────── */
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0; }
-    }
-
-    .cursor {
-      display: inline-block;
-      width: 1px;
-      height: 1em;
-      background: var(--accent);
-      margin-left: 2px;
-      vertical-align: middle;
-      animation: blink 1s step-end infinite;
-    }
-
-    /* ── Responsive ─────────────────────────────────────── */
-    @media (max-width: 768px) {
-      .chart-row-2, .chart-row-3, .confidence-grid, .finding-grid {
-        grid-template-columns: 1fr;
-      }
-      .ai-panel-body {
-        grid-template-columns: 1fr;
-      }
-      .ai-text-col { border-right: none; border-bottom: 1px solid var(--border); }
-      .report-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-      .dashboard-footer { flex-direction: column; gap: 16px; align-items: flex-start; }
-      .file-info-meta { display: none; }
-    }
-  </style>
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+</style>
 </head>
 <body>
 
-<!-- ── Sticky nav ─────────────────────────────────────────── -->
-<nav class="tl-nav">
-  <a href="index.html" class="tl-nav-logo">ARGUS</a>
+<!-- ── sticky nav ─────────────────────────────────────────── -->
+<nav id="nav" role="navigation" aria-label="Dashboard navigation">
+  <a href="index.html" id="nav-logo" aria-label="ARGUS home">ARG<span>US</span></a>
 
-  <div class="tl-nav-center">
-    <div class="tl-nav-status-dot"></div>
-    <span id="nav-status">Analysis Complete</span>
-    <span style="color:rgba(74,158,255,0.3)">·</span>
-    <span id="nav-filename" style="color:rgba(255,255,255,0.3)">–</span>
+  <div id="nav-center" aria-live="polite">
+    <span class="nav-pulse" aria-hidden="true"></span>
+    <span id="nav-status-text">Analysis Complete</span>
+    <span id="nav-sep" aria-hidden="true">·</span>
+    <span id="nav-filename">—</span>
   </div>
 
-  <div class="tl-nav-right">
-    <a href="index.html" class="btn-ghost">← New Analysis</a>
+  <div id="nav-right">
+    <a href="index.html" class="btn-back" aria-label="Start new analysis">← New Analysis</a>
   </div>
 </nav>
 
-<div class="dashboard-body">
+<!-- ── main page ──────────────────────────────────────────── -->
+<div id="page">
 
-  <!-- ── Report header ──────────────────────────────────── -->
-  <div class="report-header fade-in-section">
-    <div>
-      <span class="mono-label-accent" id="session-label">RESEARCH OUTPUT / SESSION 0x0000</span>
-      <div class="report-header-title">Traffic Dynamics Report</div>
-    </div>
-    <div class="report-header-chips">
-      <div class="meta-chip" id="chip-duration">–</div>
-      <div class="meta-chip" id="chip-resolution">–</div>
-    </div>
-  </div>
+  <!-- page header -->
+  <header id="page-header">
+    <span class="page-label">Traffic Safety Analysis</span>
+    <h1 class="page-title">Video Report</h1>
 
-  <!-- ── File info bar ──────────────────────────────────── -->
-  <div class="file-info-bar fade-in-section">
-    <svg class="file-info-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <polygon points="7,1 13,4 13,10 7,13 1,10 1,4" stroke="#4a9eff" stroke-width="0.8" fill="none"/>
-      <circle cx="7" cy="7" r="2" fill="rgba(74,158,255,0.4)"/>
-    </svg>
-    <span class="file-info-name" id="file-info-name">–</span>
-    <div class="file-info-meta">
-      <span id="file-fps">– fps</span>
-      <span id="file-resolution">–</span>
-      <span id="file-processing">–s processing</span>
-    </div>
-  </div>
-
-  <!-- ── Metrics strip ──────────────────────────────────── -->
-  <div class="stats-grid fade-in-section">
-    <div class="stat-card tl-card-accent tl-card-accent-blue">
-      <span class="stat-label">Total Vehicles</span>
-      <span class="stat-value" id="stat-vehicles">–</span>
-      <span class="stat-unit" style="color:var(--accent)">Detected</span>
-      <span class="stat-delta stat-delta-bad">↑ 12.4% above baseline</span>
-    </div>
-    <div class="stat-card tl-card-accent tl-card-accent-green">
-      <span class="stat-label">Avg Speed</span>
-      <span class="stat-value" id="stat-speed">–</span>
-      <span class="stat-unit" style="color:var(--green)">KM / H</span>
-      <span class="stat-delta stat-delta-good">↓ 8.1% below limit</span>
-    </div>
-    <div class="stat-card tl-card-accent tl-card-accent-amber">
-      <span class="stat-label">Congestion</span>
-      <span class="stat-value" id="stat-congestion">–</span>
-      <span class="stat-unit" style="color:var(--amber)">Out of 10</span>
-      <span class="stat-delta stat-delta-warn">↑ Moderate–High</span>
-    </div>
-    <div class="stat-card tl-card-accent tl-card-accent-red">
-      <span class="stat-label">Anomalies</span>
-      <span class="stat-value" id="stat-anomalies">–</span>
-      <span class="stat-unit" style="color:var(--red)">Flagged</span>
-      <span class="stat-delta stat-delta-bad" id="stat-critical-count">↑ – events critical</span>
-    </div>
-  </div>
-
-  <!-- ── Persona switcher ───────────────────────────────── -->
-  <div class="persona-tabs fade-in-section" role="tablist">
-    <button class="persona-tab active" data-persona="insurance"  role="tab">Insurance Investigator</button>
-    <button class="persona-tab"        data-persona="engineer"   role="tab">Traffic Engineer</button>
-    <button class="persona-tab"        data-persona="researcher" role="tab">Road Safety Researcher</button>
-  </div>
-
-  <!-- ── Flow timeline (full width) ────────────────────── -->
-  <div class="chart-card chart-section fade-in-section">
-    <span class="mono-label-accent">Vehicle Flow — Vehicles per Minute</span>
-    <canvas id="flow-chart" class="chart-canvas"></canvas>
-  </div>
-
-  <!-- ── Chart row 2 ────────────────────────────────────── -->
-  <div class="chart-row-2 fade-in-section">
-    <div class="chart-card">
-      <span class="mono-label">Speed Distribution</span>
-      <canvas id="speed-chart" class="chart-canvas"></canvas>
-    </div>
-    <div class="chart-card">
-      <span class="mono-label">Vehicle Composition</span>
-      <canvas id="donut-chart" class="chart-canvas"></canvas>
-    </div>
-    <div class="chart-card">
-      <span class="mono-label">Lane Utilization</span>
-      <canvas id="lane-chart" class="chart-canvas"></canvas>
-    </div>
-  </div>
-
-  <!-- ── Chart row 3 ────────────────────────────────────── -->
-  <div class="chart-row-3 fade-in-section">
-    <div class="chart-card">
-      <span class="mono-label">Congestion Heatmap — 4 Lanes × Time</span>
-      <canvas id="heatmap-chart" class="chart-canvas"></canvas>
-    </div>
-    <div class="chart-card">
-      <span class="mono-label">Anomaly Event Log</span>
-      <div class="anomaly-log" id="anomaly-log"></div>
-    </div>
-  </div>
-
-  <!-- ── Confidence metrics ─────────────────────────────── -->
-  <div class="confidence-grid fade-in-section">
-    <div class="tl-card">
-      <span class="stat-label">Detection Confidence</span>
-      <span class="conf-value" id="conf-detection">–</span>
-      <span style="font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(255,255,255,0.2)">%</span>
-      <div class="conf-bar-bg">
-        <div class="conf-bar-fill" id="conf-bar-detection"></div>
+    <!-- 4-col stats bar -->
+    <div id="stats-bar" role="region" aria-label="Summary statistics">
+      <div class="stat-cell">
+        <span class="stat-cell-label">Vehicles Detected</span>
+        <span class="stat-cell-value" id="stat-vehicles">—</span>
+        <span class="stat-cell-unit">Total tracked</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-cell-label">Incidents Flagged</span>
+        <span class="stat-cell-value" id="stat-incidents">—</span>
+        <span class="stat-cell-unit">Safety events</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-cell-label">Avg Speed</span>
+        <span class="stat-cell-value" id="stat-speed">—</span>
+        <span class="stat-cell-unit">km/h average</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-cell-label">Duration</span>
+        <span class="stat-cell-value" id="stat-duration">—</span>
+        <span class="stat-cell-unit">Video length</span>
       </div>
     </div>
-    <div class="tl-card">
-      <span class="stat-label">Tracking Accuracy</span>
-      <span class="conf-value" id="conf-tracking">–</span>
-      <span style="font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(255,255,255,0.2)">%</span>
-      <div class="conf-bar-bg">
-        <div class="conf-bar-fill" id="conf-bar-tracking"></div>
-      </div>
-    </div>
-    <div class="tl-card">
-      <span class="stat-label">Classification Precision</span>
-      <span class="conf-value" id="conf-class">–</span>
-      <span style="font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(255,255,255,0.2)">%</span>
-      <div class="conf-bar-bg">
-        <div class="conf-bar-fill" id="conf-bar-class"></div>
-      </div>
-    </div>
-  </div>
+  </header>
 
-  <!-- ── AI Analysis panel ─────────────────────────────── -->
-  <div class="ai-panel fade-in-section">
-    <div class="ai-panel-header">
-      <div style="display:flex;align-items:center;">
-        <span class="ai-icon">AI</span>
-        <div>
-          <span class="ai-panel-label">Neural Analysis Output</span>
-          <span class="ai-panel-title">Automated Research Findings</span>
+  <!-- main 2-col layout -->
+  <div id="main-cols">
+
+    <!-- LEFT: incident log -->
+    <div id="col-left">
+      <div class="panel" style="flex:1;display:flex;flex-direction:column;">
+        <div class="section-head">
+          <span class="section-head-dot" aria-hidden="true"></span>
+          Incident Log
+        </div>
+        <div id="anomaly-log" role="list" aria-label="Incident log"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: charts -->
+    <div id="col-right">
+
+      <!-- vehicle flow -->
+      <div id="flow-panel" class="panel">
+        <div class="section-head">
+          <span class="section-head-dot" aria-hidden="true"></span>
+          Vehicle Flow
+        </div>
+        <div id="flow-chart-wrap">
+          <canvas id="flow-chart" role="img" aria-label="Vehicle flow over time"></canvas>
         </div>
       </div>
-      <div class="ai-panel-chips">
-        <span class="badge badge-info" id="ai-persona-badge">Insurance Investigator</span>
-        <span class="meta-chip">Model: claude-sonnet</span>
-      </div>
-    </div>
 
-    <div class="ai-panel-body">
-      <div class="ai-text-col">
-        <div class="ai-text-area" id="ai-text-area">
-          Click 'Generate Analysis' to produce AI-powered insights for the selected persona.
+      <!-- vehicle composition -->
+      <div id="donut-panel" class="panel">
+        <div class="section-head">
+          <span class="section-head-dot" aria-hidden="true"></span>
+          Vehicle Composition
         </div>
-        <div class="ai-panel-footer" style="padding:16px 0 0 0; border-top: 1px solid var(--border); margin-top:16px;">
-          <button class="btn-generate" id="btn-generate" type="button">Generate Analysis</button>
+        <div id="donut-chart-wrap">
+          <canvas id="donut-chart" role="img" aria-label="Vehicle composition breakdown"></canvas>
+          <div id="donut-legend" aria-hidden="true"></div>
         </div>
       </div>
-      <div class="ai-meta-col">
-        <span class="mono-label" style="margin-bottom:10px;">Key Metrics</span>
-        <table class="ai-metrics-table">
-          <tr><td>Peak Flow</td>     <td id="metric-peak-flow">–</td></tr>
-          <tr><td>Min Headway</td>   <td id="metric-min-headway">–</td></tr>
-          <tr><td>Max Speed</td>     <td id="metric-max-speed">–</td></tr>
-          <tr><td>Detection FPS</td> <td id="metric-fps">–</td></tr>
-          <tr><td>Track Loss Rate</td><td id="metric-track-loss">–</td></tr>
-          <tr><td>Avg Dwell</td>     <td id="metric-avg-dwell">–</td></tr>
-        </table>
-        <span class="mono-label" style="margin-bottom:10px;">Recommendations</span>
-        <div id="ai-recommendations"></div>
+
+      <!-- pipeline confidence -->
+      <div id="conf-panel" class="panel">
+        <div class="section-head">
+          <span class="section-head-dot" aria-hidden="true"></span>
+          Pipeline Confidence
+        </div>
+        <div id="conf-body">
+          <div class="conf-row">
+            <div class="conf-row-head">
+              <span class="conf-row-label">Detection</span>
+              <span class="conf-row-value" id="conf-detection">—</span>
+            </div>
+            <div class="conf-bar-bg" role="progressbar" aria-label="Detection confidence" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+              <div class="conf-bar-fill" id="conf-bar-detection"></div>
+            </div>
+          </div>
+          <div class="conf-row">
+            <div class="conf-row-head">
+              <span class="conf-row-label">Tracking</span>
+              <span class="conf-row-value" id="conf-tracking">—</span>
+            </div>
+            <div class="conf-bar-bg" role="progressbar" aria-label="Tracking accuracy" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+              <div class="conf-bar-fill" id="conf-bar-tracking"></div>
+            </div>
+          </div>
+          <div class="conf-row">
+            <div class="conf-row-head">
+              <span class="conf-row-label">Classification</span>
+              <span class="conf-row-value" id="conf-class">—</span>
+            </div>
+            <div class="conf-bar-bg" role="progressbar" aria-label="Classification precision" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+              <div class="conf-bar-fill" id="conf-bar-class"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /#col-right -->
+  </div><!-- /#main-cols -->
+
+</div><!-- /#page -->
+
+<!-- ── video modal ────────────────────────────────────────── -->
+<div id="video-modal" role="dialog" aria-modal="true" aria-label="Incident video playback">
+  <div id="modal-inner">
+    <div id="modal-header">
+      <span id="modal-header-label">Incident Playback</span>
+      <button id="modal-close" type="button" aria-label="Close video playback">&#x2715;</button>
+    </div>
+    <div id="modal-video-wrap">
+      <video id="modal-video" controls preload="metadata" playsinline>
+        Your browser does not support HTML5 video.
+      </video>
+    </div>
+    <div id="modal-metrics" role="region" aria-label="Incident metrics">
+      <div class="modal-metric-cell">
+        <span class="modal-metric-label">Type</span>
+        <span class="modal-metric-value" id="mm-type">—</span>
+      </div>
+      <div class="modal-metric-cell">
+        <span class="modal-metric-label">Severity</span>
+        <span class="modal-metric-value" id="mm-severity">—</span>
+      </div>
+      <div class="modal-metric-cell">
+        <span class="modal-metric-label">Time to Collision</span>
+        <span class="modal-metric-value" id="mm-ttc">—</span>
+      </div>
+      <div class="modal-metric-cell">
+        <span class="modal-metric-label">Closing Speed</span>
+        <span class="modal-metric-value" id="mm-speed">—</span>
       </div>
     </div>
-  </div>
-
-  <!-- ── Finding cards ──────────────────────────────────── -->
-  <div class="finding-grid fade-in-section">
-    <div class="tl-card">
-      <span class="finding-number">Finding 01</span>
-      <span class="finding-value" id="finding-peak-flow">–</span>
-      <span class="finding-label" id="finding-peak-label">Peak flow computation pending…</span>
-    </div>
-    <div class="tl-card">
-      <span class="finding-number">Finding 02</span>
-      <span class="finding-value" id="finding-lane-excess">–</span>
-      <span class="finding-label" id="finding-lane-label">Lane utilisation analysis pending…</span>
-    </div>
-    <div class="tl-card">
-      <span class="finding-number">Finding 03</span>
-      <span class="finding-value" id="finding-critical">–</span>
-      <span class="finding-label">Critical-severity events requiring immediate review and possible intervention</span>
-    </div>
-  </div>
-
-  <!-- ── Dashboard footer ───────────────────────────────── -->
-  <div class="dashboard-footer fade-in-section">
-    <div class="dashboard-footer-left" id="footer-session">
-      Session – · Processed in –s · ARGUS-v2.1
-    </div>
-    <div class="dashboard-footer-right">
-      <button class="btn-ghost" id="btn-export-csv" type="button">Export CSV</button>
-      <button class="btn-ghost" id="btn-export-pdf" type="button">Export PDF</button>
-      <button class="btn-ghost" type="button">Share Report</button>
-    </div>
-  </div>
-
-</div><!-- /.dashboard-body -->
-
-<!-- ── Q&A Chat panel ─────────────────────────────────────── -->
-<button class="chat-toggle" id="chat-toggle" type="button" aria-label="Open AI assistant"
-  style="
-    position:fixed; bottom:28px; right:28px; z-index:300;
-    width:48px; height:48px;
-    background:#0a1520; border:1px solid rgba(74,158,255,0.35);
-    border-radius:0; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    transition: border-color 0.2s;
-  ">
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-    <path d="M3 4h14v9H3z" stroke="#4a9eff" stroke-width="1" fill="none"/>
-    <path d="M6 16l2-3h6" stroke="#4a9eff" stroke-width="1" fill="none"/>
-  </svg>
-</button>
-
-<div id="chat-panel" style="
-  position:fixed; bottom:90px; right:28px; z-index:300;
-  width:360px; height:480px;
-  background:#0a1520; border:1px solid rgba(74,158,255,0.2);
-  display:none; flex-direction:column;
-">
-  <div style="
-    display:flex; justify-content:space-between; align-items:center;
-    padding:14px 16px; border-bottom:1px solid var(--border);
-  ">
-    <span style="font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,0.4);text-transform:uppercase;">
-      Ask About This Footage
-    </span>
-    <button id="chat-close" type="button" style="
-      background:none; border:none; color:rgba(255,255,255,0.3);
-      cursor:pointer; font-size:16px; line-height:1; padding:0;
-    ">×</button>
-  </div>
-  <div id="chat-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;">
-    <div class="chat-ai-msg" style="
-      background:rgba(74,158,255,0.06); border-left:2px solid #4a9eff;
-      padding:10px 12px; font-family:'Barlow',sans-serif; font-weight:300;
-      font-size:12px; color:rgba(255,255,255,0.6); line-height:1.7;
-    ">
-      I have analysed the footage and identified 9 incidents including 2 accidents. Ask me anything about specific vehicles, timing of events, or recommendations.
-    </div>
-    <div id="chat-suggestions" style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
-      <button class="chat-suggestion" data-q="What caused the T+00:47 incident?" type="button">What caused the T+00:47 incident?</button>
-      <button class="chat-suggestion" data-q="Which lane has the highest risk?" type="button">Which lane has the highest risk?</button>
-      <button class="chat-suggestion" data-q="What are the top recommendations?" type="button">What are the top recommendations?</button>
-    </div>
-  </div>
-  <div style="
-    display:flex; gap:8px; padding:12px;
-    border-top:1px solid var(--border);
-  ">
-    <input id="chat-input" type="text" placeholder="Ask about the footage…" style="
-      flex:1; background:#06090f; border:1px solid rgba(74,158,255,0.2);
-      color:rgba(255,255,255,0.8); padding:8px 12px;
-      font-family:'Barlow',sans-serif; font-weight:300; font-size:12px;
-      border-radius:0; outline:none;
-    " />
-    <button id="chat-send" type="button" style="
-      font-family:'Share Tech Mono',monospace; font-size:8px; letter-spacing:2px;
-      background:rgba(74,158,255,0.1); border:1px solid rgba(74,158,255,0.3);
-      color:#4a9eff; padding:8px 14px; cursor:pointer; text-transform:uppercase;
-    ">Send</button>
   </div>
 </div>
-
-<style>
-  .chat-suggestion {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 7px;
-    letter-spacing: 1.5px;
-    border: 1px solid rgba(74,158,255,0.2);
-    padding: 5px 12px;
-    color: rgba(255,255,255,0.4);
-    background: transparent;
-    cursor: pointer;
-    text-align: left;
-    transition: color 0.15s, border-color 0.15s;
-    border-radius: 0;
-    text-transform: uppercase;
-  }
-  .chat-suggestion:hover { color: #4a9eff; border-color: rgba(74,158,255,0.4); }
-</style>
 
 <script type="module" src="js/dashboard.js"></script>
 </body>
