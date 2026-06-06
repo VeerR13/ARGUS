@@ -81,10 +81,11 @@ export async function pollJobStatus(videoId, onProgress, onComplete, onError) {
       log('pollJobStatus', `GET /api/jobs/${videoId}/status`);
       const res = await fetch(`${API_BASE}/api/jobs/${videoId}/status`);
       if (!res.ok) throw new Error(`Status poll failed: ${res.status}`);
-      const { status, progress, message } = await res.json();
+      const payload = await res.json();
+      const { status, progress, message, result } = payload;
       onProgress(progress, message);
       if (status === 'COMPLETE') {
-        const data = await getAnalysis(videoId);
+        const data = result || await getAnalysis(videoId);
         onComplete(data);
       } else if (status === 'ERROR') {
         throw new Error(message || 'Processing failed');

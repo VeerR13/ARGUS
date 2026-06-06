@@ -34,11 +34,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const cached = localStorage.getItem('tl_analysis');
   try {
     analysisData = cached ? JSON.parse(cached) : await getAnalysis(videoId);
-  } catch (e) {
-    analysisData = await getAnalysis(videoId);
+  } catch (_) {
+    try { analysisData = await getAnalysis(videoId); } catch (__) { /* session expired */ }
   }
 
   populateNav(filename);
+
+  if (!analysisData || !analysisData.metadata) {
+    const main = document.querySelector('main') || document.body;
+    const msg = document.createElement('div');
+    msg.style.cssText = 'padding:120px 40px;text-align:center;font-family:monospace;color:rgba(255,255,255,0.35);font-size:13px;letter-spacing:.1em';
+    msg.innerHTML = 'SESSION EXPIRED — analysis results are not persisted between server restarts.<br><br><a href="index.html" style="color:#00e5ff">← Upload a new video</a>';
+    main.appendChild(msg);
+    return;
+  }
   populateHeader(analysisData, filename);
   populateStats(analysisData);
   populateFileInfoBar(analysisData, filename);

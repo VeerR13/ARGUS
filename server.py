@@ -254,12 +254,15 @@ async def job_status(video_id: str):
         job = _jobs.get(video_id)
     if job is None:
         raise HTTPException(404, f"Job {video_id} not found")
-    return {
+    resp = {
         "video_id": video_id,
         "status":   job["status"],
         "progress": job["progress"],
         "message":  job["message"],
     }
+    if job["status"] == "COMPLETE" and job.get("result"):
+        resp["result"] = job["result"]
+    return resp
 
 
 @app.get("/api/videos/{video_id}/analysis")
