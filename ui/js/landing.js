@@ -213,6 +213,7 @@ let clock = 0;
 
 function animate() {
   animFrameId = requestAnimationFrame(animate);
+  if (!renderer) return;
   clock += 0.016;
 
   // Rotate Earth & clouds
